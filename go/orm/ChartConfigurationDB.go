@@ -60,6 +60,9 @@ type ChartConfigurationDB struct {
 
 	// Declation for basic field chartconfigurationDB.Name {{BasicKind}} (to be completed)
 	Name_Data sql.NullString
+
+	// Declation for basic field chartconfigurationDB.ChartType {{BasicKind}} (to be completed)
+	ChartType_Data sql.NullString
 	// encoding of pointers
 	ChartConfigurationPointersEnconding
 }
@@ -82,6 +85,8 @@ type ChartConfigurationWOP struct {
 	// insertion for WOP basic fields
 
 	Name string `xlsx:"1"`
+
+	ChartType models.ChartType `xlsx:"2"`
 	// insertion for WOP pointer fields
 }
 
@@ -89,6 +94,7 @@ var ChartConfiguration_Fields = []string{
 	// insertion for WOP basic fields
 	"ID",
 	"Name",
+	"ChartType",
 }
 
 type BackRepoChartConfigurationStruct struct {
@@ -464,6 +470,9 @@ func (chartconfigurationDB *ChartConfigurationDB) CopyBasicFieldsFromChartConfig
 
 	chartconfigurationDB.Name_Data.String = chartconfiguration.Name
 	chartconfigurationDB.Name_Data.Valid = true
+
+	chartconfigurationDB.ChartType_Data.String = chartconfiguration.ChartType.ToString()
+	chartconfigurationDB.ChartType_Data.Valid = true
 }
 
 // CopyBasicFieldsFromChartConfigurationWOP
@@ -472,12 +481,16 @@ func (chartconfigurationDB *ChartConfigurationDB) CopyBasicFieldsFromChartConfig
 
 	chartconfigurationDB.Name_Data.String = chartconfiguration.Name
 	chartconfigurationDB.Name_Data.Valid = true
+
+	chartconfigurationDB.ChartType_Data.String = chartconfiguration.ChartType.ToString()
+	chartconfigurationDB.ChartType_Data.Valid = true
 }
 
 // CopyBasicFieldsToChartConfiguration
 func (chartconfigurationDB *ChartConfigurationDB) CopyBasicFieldsToChartConfiguration(chartconfiguration *models.ChartConfiguration) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	chartconfiguration.Name = chartconfigurationDB.Name_Data.String
+	chartconfiguration.ChartType.FromString(chartconfigurationDB.ChartType_Data.String)
 }
 
 // CopyBasicFieldsToChartConfigurationWOP
@@ -485,6 +498,7 @@ func (chartconfigurationDB *ChartConfigurationDB) CopyBasicFieldsToChartConfigur
 	chartconfiguration.ID = int(chartconfigurationDB.ID)
 	// insertion point for checkout of basic fields (back repo to stage)
 	chartconfiguration.Name = chartconfigurationDB.Name_Data.String
+	chartconfiguration.ChartType.FromString(chartconfigurationDB.ChartType_Data.String)
 }
 
 // Backup generates a json file from a slice of all ChartConfigurationDB instances in the backrepo

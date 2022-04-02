@@ -14,13 +14,6 @@ export * from './lib/commitnb.service'
 export * from './lib/push_from_front_nb.service'
 
 
-export * from './lib/chart-detail/chart-detail.component'
-export * from './lib/chart-presentation/chart-presentation.component'
-export * from './lib/chart-sorting/chart-sorting.component'
-export * from './lib/charts-table/charts-table.component'
-export * from './lib/chart-db'
-export * from './lib/chart.service'
-
 export * from './lib/chartconfiguration-detail/chartconfiguration-detail.component'
 export * from './lib/chartconfiguration-presentation/chartconfiguration-presentation.component'
 export * from './lib/chartconfiguration-sorting/chartconfiguration-sorting.component'
@@ -50,3 +43,4 @@ export * from './lib/label-db'
 export * from './lib/label.service'
 
 
+export * from './lib/ChartType'

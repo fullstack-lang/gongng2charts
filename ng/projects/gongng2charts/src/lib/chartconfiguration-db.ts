@@ -12,6 +12,7 @@ export class ChartConfigurationDB {
 
 	// insertion point for basic fields declarations
 	Name: string = ""
+	ChartType: string = ""
 
 	// insertion point for other declarations
 	Datasets?: Array<DatasetDB>

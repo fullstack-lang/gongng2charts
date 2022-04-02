@@ -34,6 +34,26 @@
             </button>
         </mat-grid-tile>
     </mat-grid-list>
+    <mat-grid-list *ngIf='!isATextArea("Label")' cols="5" rowHeight="2:1">
+        <mat-grid-tile [colspan]="3">
+            <mat-form-field mat-form-field class="detail-full-width">
+                <mat-label>Label</mat-label>
+                <input name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="dataset.Label">
+            </mat-form-field>
+        </mat-grid-tile>
+        <mat-grid-tile>
+            <button mat-raised-button (click)="toggleTextArea('Label')">
+                <mat-icon>
+                    expand_more
+                </mat-icon>
+            </button>
+        </mat-grid-tile>
+    </mat-grid-list>
+    <mat-form-field *ngIf='isATextArea("Label")' mat-form-field class="detail-full-width">
+        <mat-label>Label</mat-label>
+        <textarea name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="dataset.Label"></textarea>
+    </mat-form-field>
+
     <mat-form-field class="detail-full-width">
         <mat-label>(ChartConfiguration) Datasets</mat-label>
         <mat-select [compareWith]="compareObjects" [(ngModel)]="dataset.ChartConfiguration_Datasets_reverse" [ngModelOptions]="{standalone: true}">

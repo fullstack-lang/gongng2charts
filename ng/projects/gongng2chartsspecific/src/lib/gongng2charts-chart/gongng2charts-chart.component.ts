@@ -145,7 +145,7 @@ export class Gongng2chartsChartComponent implements OnInit {
             {
               // data: [65, 59, 80, 81, 56, 55, 40],
               data: datapoints,
-              label: 'Series A',
+              label: dataset.Label,
               backgroundColor: 'rgba(148,159,177,0.2)',
               borderColor: 'rgba(148,159,177,1)',
               pointBackgroundColor: 'rgba(148,159,177,1)',
@@ -161,6 +161,10 @@ export class Gongng2chartsChartComponent implements OnInit {
           let label = this.chartConfig.Labels![i]
           this.lineChartData.labels.push(label.Name)
         }
+
+        // set chart type
+        this.lineChartType = this.chartConfig.ChartType as ChartType
+        this.lineChartType = 'line'
 
         console.log("finished rendering")
         this.chart?.update();

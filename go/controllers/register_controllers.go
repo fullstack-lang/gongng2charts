@@ -43,13 +43,6 @@ type ValidationError struct {
 func RegisterControllers(r *gin.Engine) {
 	v1 := r.Group("/api/github.com/fullstack-lang/gongng2charts/go")
 	{ // insertion point for registrations
-		v1.GET("/v1/charts", GetCharts)
-		v1.GET("/v1/charts/:id", GetChart)
-		v1.POST("/v1/charts", PostChart)
-		v1.PATCH("/v1/charts/:id", UpdateChart)
-		v1.PUT("/v1/charts/:id", UpdateChart)
-		v1.DELETE("/v1/charts/:id", DeleteChart)
-
 		v1.GET("/v1/chartconfigurations", GetChartConfigurations)
 		v1.GET("/v1/chartconfigurations/:id", GetChartConfiguration)
 		v1.POST("/v1/chartconfigurations", PostChartConfiguration)

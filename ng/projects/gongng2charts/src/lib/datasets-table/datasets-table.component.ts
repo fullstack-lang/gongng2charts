@@ -71,6 +71,9 @@ export class DatasetsTableComponent implements OnInit {
         case 'Name':
           return datasetDB.Name;
 
+        case 'Label':
+          return datasetDB.Label;
+
         case 'ChartConfiguration_Datasets':
           return this.frontRepo.ChartConfigurations.get(datasetDB.ChartConfiguration_DatasetsDBID.Int64)!.Name;
 
@@ -89,6 +92,7 @@ export class DatasetsTableComponent implements OnInit {
 
       // insertion point for merging of fields
       mergedContent += datasetDB.Name.toLowerCase()
+      mergedContent += datasetDB.Label.toLowerCase()
       if (datasetDB.ChartConfiguration_DatasetsDBID.Int64 != 0) {
         mergedContent += this.frontRepo.ChartConfigurations.get(datasetDB.ChartConfiguration_DatasetsDBID.Int64)!.Name.toLowerCase()
       }
@@ -144,11 +148,13 @@ export class DatasetsTableComponent implements OnInit {
     if (this.mode == TableComponentMode.DISPLAY_MODE) {
       this.displayedColumns = ['ID', 'Edit', 'Delete', // insertion point for columns to display
         "Name",
+        "Label",
         "ChartConfiguration_Datasets",
       ]
     } else {
       this.displayedColumns = ['select', 'ID', // insertion point for columns to display
         "Name",
+        "Label",
         "ChartConfiguration_Datasets",
       ]
       this.selection = new SelectionModel<DatasetDB>(allowMultiSelect, this.initialSelection);

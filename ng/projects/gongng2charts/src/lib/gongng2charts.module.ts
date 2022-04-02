@@ -38,11 +38,6 @@ import { SplitterComponent } from './splitter/splitter.component'
 import { SidebarComponent } from './sidebar/sidebar.component';
 
 // insertion point for imports 
-import { ChartsTableComponent } from './charts-table/charts-table.component'
-import { ChartSortingComponent } from './chart-sorting/chart-sorting.component'
-import { ChartDetailComponent } from './chart-detail/chart-detail.component'
-import { ChartPresentationComponent } from './chart-presentation/chart-presentation.component'
-
 import { ChartConfigurationsTableComponent } from './chartconfigurations-table/chartconfigurations-table.component'
 import { ChartConfigurationSortingComponent } from './chartconfiguration-sorting/chartconfiguration-sorting.component'
 import { ChartConfigurationDetailComponent } from './chartconfiguration-detail/chartconfiguration-detail.component'
@@ -67,11 +62,6 @@ import { LabelPresentationComponent } from './label-presentation/label-presentat
 @NgModule({
 	declarations: [
 		// insertion point for declarations 
-		ChartsTableComponent,
-		ChartSortingComponent,
-		ChartDetailComponent,
-		ChartPresentationComponent,
-
 		ChartConfigurationsTableComponent,
 		ChartConfigurationSortingComponent,
 		ChartConfigurationDetailComponent,
@@ -131,11 +121,6 @@ import { LabelPresentationComponent } from './label-presentation/label-presentat
 	],
 	exports: [
 		// insertion point for declarations 
-		ChartsTableComponent,
-		ChartSortingComponent,
-		ChartDetailComponent,
-		ChartPresentationComponent,
-
 		ChartConfigurationsTableComponent,
 		ChartConfigurationSortingComponent,
 		ChartConfigurationDetailComponent,

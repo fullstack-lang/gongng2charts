@@ -28,9 +28,6 @@ type GongStructInterface interface {
 // StageStruct enables storage of staged instances
 // swagger:ignore
 type StageStruct struct { // insertion point for definition of arrays registering instances
-	Charts           map[*Chart]struct{}
-	Charts_mapString map[string]*Chart
-
 	ChartConfigurations           map[*ChartConfiguration]struct{}
 	ChartConfigurations_mapString map[string]*ChartConfiguration
 
@@ -70,8 +67,6 @@ type BackRepoInterface interface {
 	BackupXL(stage *StageStruct, dirPath string)
 	RestoreXL(stage *StageStruct, dirPath string)
 	// insertion point for Commit and Checkout signatures
-	CommitChart(chart *Chart)
-	CheckoutChart(chart *Chart)
 	CommitChartConfiguration(chartconfiguration *ChartConfiguration)
 	CheckoutChartConfiguration(chartconfiguration *ChartConfiguration)
 	CommitDataPoint(datapoint *DataPoint)
@@ -86,9 +81,6 @@ type BackRepoInterface interface {
 
 // swagger:ignore instructs the gong compiler (gongc) to avoid this particular struct
 var Stage StageStruct = StageStruct{ // insertion point for array initiatialisation
-	Charts:           make(map[*Chart]struct{}),
-	Charts_mapString: make(map[string]*Chart),
-
 	ChartConfigurations:           make(map[*ChartConfiguration]struct{}),
 	ChartConfigurations_mapString: make(map[string]*ChartConfiguration),
 
@@ -111,7 +103,6 @@ func (stage *StageStruct) Commit() {
 	}
 
 	// insertion point for computing the map of number of instances per gongstruct
-	stage.Map_GongStructName_InstancesNb["Chart"] = len(stage.Charts)
 	stage.Map_GongStructName_InstancesNb["ChartConfiguration"] = len(stage.ChartConfigurations)
 	stage.Map_GongStructName_InstancesNb["DataPoint"] = len(stage.DataPoints)
 	stage.Map_GongStructName_InstancesNb["Dataset"] = len(stage.Datasets)
@@ -154,128 +145,6 @@ func (stage *StageStruct) RestoreXL(dirPath string) {
 }
 
 // insertion point for cumulative sub template with model space calls
-func (stage *StageStruct) getChartOrderedStructWithNameField() []*Chart {
-	// have alphabetical order generation
-	chartOrdered := []*Chart{}
-	for chart := range stage.Charts {
-		chartOrdered = append(chartOrdered, chart)
-	}
-	sort.Slice(chartOrdered[:], func(i, j int) bool {
-		return chartOrdered[i].Name < chartOrdered[j].Name
-	})
-	return chartOrdered
-}
-
-// Stage puts chart to the model stage
-func (chart *Chart) Stage() *Chart {
-	Stage.Charts[chart] = __member
-	Stage.Charts_mapString[chart.Name] = chart
-
-	return chart
-}
-
-// Unstage removes chart off the model stage
-func (chart *Chart) Unstage() *Chart {
-	delete(Stage.Charts, chart)
-	delete(Stage.Charts_mapString, chart.Name)
-	return chart
-}
-
-// commit chart to the back repo (if it is already staged)
-func (chart *Chart) Commit() *Chart {
-	if _, ok := Stage.Charts[chart]; ok {
-		if Stage.BackRepo != nil {
-			Stage.BackRepo.CommitChart(chart)
-		}
-	}
-	return chart
-}
-
-// Checkout chart to the back repo (if it is already staged)
-func (chart *Chart) Checkout() *Chart {
-	if _, ok := Stage.Charts[chart]; ok {
-		if Stage.BackRepo != nil {
-			Stage.BackRepo.CheckoutChart(chart)
-		}
-	}
-	return chart
-}
-
-//
-// Legacy, to be deleted
-//
-
-// StageCopy appends a copy of chart to the model stage
-func (chart *Chart) StageCopy() *Chart {
-	_chart := new(Chart)
-	*_chart = *chart
-	_chart.Stage()
-	return _chart
-}
-
-// StageAndCommit appends chart to the model stage and commit to the orm repo
-func (chart *Chart) StageAndCommit() *Chart {
-	chart.Stage()
-	if Stage.AllModelsStructCreateCallback != nil {
-		Stage.AllModelsStructCreateCallback.CreateORMChart(chart)
-	}
-	return chart
-}
-
-// DeleteStageAndCommit appends chart to the model stage and commit to the orm repo
-func (chart *Chart) DeleteStageAndCommit() *Chart {
-	chart.Unstage()
-	DeleteORMChart(chart)
-	return chart
-}
-
-// StageCopyAndCommit appends a copy of chart to the model stage and commit to the orm repo
-func (chart *Chart) StageCopyAndCommit() *Chart {
-	_chart := new(Chart)
-	*_chart = *chart
-	_chart.Stage()
-	if Stage.AllModelsStructCreateCallback != nil {
-		Stage.AllModelsStructCreateCallback.CreateORMChart(chart)
-	}
-	return _chart
-}
-
-// CreateORMChart enables dynamic staging of a Chart instance
-func CreateORMChart(chart *Chart) {
-	chart.Stage()
-	if Stage.AllModelsStructCreateCallback != nil {
-		Stage.AllModelsStructCreateCallback.CreateORMChart(chart)
-	}
-}
-
-// DeleteORMChart enables dynamic staging of a Chart instance
-func DeleteORMChart(chart *Chart) {
-	chart.Unstage()
-	if Stage.AllModelsStructDeleteCallback != nil {
-		Stage.AllModelsStructDeleteCallback.DeleteORMChart(chart)
-	}
-}
-
-// for satisfaction of GongStruct interface
-func (chart *Chart) GetName() (res string) {
-	return chart.Name
-}
-
-func (chart *Chart) GetFields() (res []string) {
-	// list of fields 
-	res = []string{"Name",  }
-	return
-}
-
-func (chart *Chart) GetFieldStringValue(fieldName string) (res string) {
-	switch fieldName {
-	// string value of fields
-	case "Name":
-		res = chart.Name
-	}
-	return
-}
-
 func (stage *StageStruct) getChartConfigurationOrderedStructWithNameField() []*ChartConfiguration {
 	// have alphabetical order generation
 	chartconfigurationOrdered := []*ChartConfiguration{}
@@ -385,7 +254,7 @@ func (chartconfiguration *ChartConfiguration) GetName() (res string) {
 
 func (chartconfiguration *ChartConfiguration) GetFields() (res []string) {
 	// list of fields 
-	res = []string{"Name", "Datasets", "Labels",  }
+	res = []string{"Name", "Datasets", "Labels", "ChartType",  }
 	return
 }
 
@@ -408,6 +277,8 @@ func (chartconfiguration *ChartConfiguration) GetFieldStringValue(fieldName stri
 			}
 			res += __instance__.Name
 		}
+	case "ChartType":
+		res = chartconfiguration.ChartType.ToCodeString()
 	}
 	return
 }
@@ -645,7 +516,7 @@ func (dataset *Dataset) GetName() (res string) {
 
 func (dataset *Dataset) GetFields() (res []string) {
 	// list of fields 
-	res = []string{"Name", "DataPoints",  }
+	res = []string{"Name", "DataPoints", "Label",  }
 	return
 }
 
@@ -661,6 +532,8 @@ func (dataset *Dataset) GetFieldStringValue(fieldName string) (res string) {
 			}
 			res += __instance__.Name
 		}
+	case "Label":
+		res = dataset.Label
 	}
 	return
 }
@@ -789,7 +662,6 @@ func (label *Label) GetFieldStringValue(fieldName string) (res string) {
 
 // swagger:ignore
 type AllModelsStructCreateInterface interface { // insertion point for Callbacks on creation
-	CreateORMChart(Chart *Chart)
 	CreateORMChartConfiguration(ChartConfiguration *ChartConfiguration)
 	CreateORMDataPoint(DataPoint *DataPoint)
 	CreateORMDataset(Dataset *Dataset)
@@ -797,7 +669,6 @@ type AllModelsStructCreateInterface interface { // insertion point for Callbacks
 }
 
 type AllModelsStructDeleteInterface interface { // insertion point for Callbacks on deletion
-	DeleteORMChart(Chart *Chart)
 	DeleteORMChartConfiguration(ChartConfiguration *ChartConfiguration)
 	DeleteORMDataPoint(DataPoint *DataPoint)
 	DeleteORMDataset(Dataset *Dataset)
@@ -805,9 +676,6 @@ type AllModelsStructDeleteInterface interface { // insertion point for Callbacks
 }
 
 func (stage *StageStruct) Reset() { // insertion point for array reset
-	stage.Charts = make(map[*Chart]struct{})
-	stage.Charts_mapString = make(map[string]*Chart)
-
 	stage.ChartConfigurations = make(map[*ChartConfiguration]struct{})
 	stage.ChartConfigurations_mapString = make(map[string]*ChartConfiguration)
 
@@ -823,9 +691,6 @@ func (stage *StageStruct) Reset() { // insertion point for array reset
 }
 
 func (stage *StageStruct) Nil() { // insertion point for array nil
-	stage.Charts = nil
-	stage.Charts_mapString = nil
-
 	stage.ChartConfigurations = nil
 	stage.ChartConfigurations_mapString = nil
 
@@ -914,38 +779,6 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	setValueField := ""
 
 	// insertion initialization of objects to stage
-	map_Chart_Identifiers := make(map[*Chart]string)
-	_ = map_Chart_Identifiers
-
-	chartOrdered := []*Chart{}
-	for chart := range stage.Charts {
-		chartOrdered = append(chartOrdered, chart)
-	}
-	sort.Slice(chartOrdered[:], func(i, j int) bool {
-		return chartOrdered[i].Name < chartOrdered[j].Name
-	})
-	identifiersDecl += fmt.Sprintf("\n\n	// Declarations of staged instances of Chart")
-	for idx, chart := range chartOrdered {
-
-		id = generatesIdentifier("Chart", idx, chart.Name)
-		map_Chart_Identifiers[chart] = id
-
-		decl = IdentifiersDecls
-		decl = strings.ReplaceAll(decl, "{{Identifier}}", id)
-		decl = strings.ReplaceAll(decl, "{{GeneratedStructName}}", "Chart")
-		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", chart.Name)
-		identifiersDecl += decl
-
-		initializerStatements += fmt.Sprintf("\n\n	// Chart %s values setup", chart.Name)
-		// Initialisation of values
-		setValueField = StringInitStatement
-		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
-		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Name")
-		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(chart.Name))
-		initializerStatements += setValueField
-
-	}
-
 	map_ChartConfiguration_Identifiers := make(map[*ChartConfiguration]string)
 	_ = map_ChartConfiguration_Identifiers
 
@@ -975,6 +808,14 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Name")
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(chartconfiguration.Name))
 		initializerStatements += setValueField
+
+		if chartconfiguration.ChartType != "" {
+			setValueField = StringEnumInitStatement
+			setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+			setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "ChartType")
+			setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", "models."+chartconfiguration.ChartType.ToCodeString())
+			initializerStatements += setValueField
+		}
 
 	}
 
@@ -1046,6 +887,12 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(dataset.Name))
 		initializerStatements += setValueField
 
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Label")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(dataset.Label))
+		initializerStatements += setValueField
+
 	}
 
 	map_Label_Identifiers := make(map[*Label]string)
@@ -1081,16 +928,6 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	}
 
 	// insertion initialization of objects to stage
-	for idx, chart := range chartOrdered {
-		var setPointerField string
-		_ = setPointerField
-
-		id = generatesIdentifier("Chart", idx, chart.Name)
-		map_Chart_Identifiers[chart] = id
-
-		// Initialisation of values
-	}
-
 	for idx, chartconfiguration := range chartconfigurationOrdered {
 		var setPointerField string
 		_ = setPointerField
@@ -1179,3 +1016,66 @@ func generatesIdentifier(gongStructName string, idx int, instanceName string) (i
 }
 
 // insertion point of enum utility functions
+// Utility function for ChartType
+// if enum values are string, it is stored with the value
+// if enum values are int, they are stored with the code of the value
+func (charttype ChartType) ToString() (res string) {
+
+	// migration of former implementation of enum
+	switch charttype {
+	// insertion code per enum code
+	case BAR:
+		res = "bar"
+	case DOUGHNUT:
+		res = "doughnut"
+	case LINE:
+		res = "line"
+	case PIE:
+		res = "pie"
+	case POLAR_AREA:
+		res = "polarArea"
+	case RADAR:
+		res = "radar"
+	}
+	return
+}
+
+func (charttype *ChartType) FromString(input string) {
+
+	switch input {
+	// insertion code per enum code
+	case "bar":
+		*charttype = BAR
+	case "doughnut":
+		*charttype = DOUGHNUT
+	case "line":
+		*charttype = LINE
+	case "pie":
+		*charttype = PIE
+	case "polarArea":
+		*charttype = POLAR_AREA
+	case "radar":
+		*charttype = RADAR
+	}
+}
+
+func (charttype *ChartType) ToCodeString() (res string) {
+
+	switch *charttype {
+	// insertion code per enum code
+	case BAR:
+		res = "BAR"
+	case DOUGHNUT:
+		res = "DOUGHNUT"
+	case LINE:
+		res = "LINE"
+	case PIE:
+		res = "PIE"
+	case POLAR_AREA:
+		res = "POLAR_AREA"
+	case RADAR:
+		res = "RADAR"
+	}
+	return
+}
+

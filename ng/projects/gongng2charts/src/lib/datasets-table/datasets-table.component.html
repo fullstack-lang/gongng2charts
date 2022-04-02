@@ -26,6 +26,13 @@
             </td>
         </ng-container>
         <!-- -->
+        <ng-container matColumnDef="Label">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Label </th>
+            <td mat-cell *matCellDef="let Dataset">
+                {{Dataset.Label}}
+            </td>
+        </ng-container>
+        <!-- -->
         <ng-container matColumnDef="ChartConfiguration_Datasets">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> <-- (ChartConfiguration) Datasets </th>
             <td mat-cell *matCellDef="let dataset">

@@ -19,8 +19,6 @@ import (
 // BackRepoStruct supports callback functions
 type BackRepoStruct struct {
 	// insertion point for per struct back repo declarations
-	BackRepoChart BackRepoChartStruct
-
 	BackRepoChartConfiguration BackRepoChartConfigurationStruct
 
 	BackRepoDataPoint BackRepoDataPointStruct
@@ -67,7 +65,6 @@ func (backRepo *BackRepoStruct) IncrementPushFromFrontNb() uint {
 // Init the BackRepoStruct inner variables and link to the database
 func (backRepo *BackRepoStruct) init(db *gorm.DB) {
 	// insertion point for per struct back repo declarations
-	backRepo.BackRepoChart.Init(db)
 	backRepo.BackRepoChartConfiguration.Init(db)
 	backRepo.BackRepoDataPoint.Init(db)
 	backRepo.BackRepoDataset.Init(db)
@@ -79,14 +76,12 @@ func (backRepo *BackRepoStruct) init(db *gorm.DB) {
 // Commit the BackRepoStruct inner variables and link to the database
 func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 	// insertion point for per struct back repo phase one commit
-	backRepo.BackRepoChart.CommitPhaseOne(stage)
 	backRepo.BackRepoChartConfiguration.CommitPhaseOne(stage)
 	backRepo.BackRepoDataPoint.CommitPhaseOne(stage)
 	backRepo.BackRepoDataset.CommitPhaseOne(stage)
 	backRepo.BackRepoLabel.CommitPhaseOne(stage)
 
 	// insertion point for per struct back repo phase two commit
-	backRepo.BackRepoChart.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoChartConfiguration.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoDataPoint.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoDataset.CommitPhaseTwo(backRepo)
@@ -98,14 +93,12 @@ func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 // Checkout the database into the stage
 func (backRepo *BackRepoStruct) Checkout(stage *models.StageStruct) {
 	// insertion point for per struct back repo phase one commit
-	backRepo.BackRepoChart.CheckoutPhaseOne()
 	backRepo.BackRepoChartConfiguration.CheckoutPhaseOne()
 	backRepo.BackRepoDataPoint.CheckoutPhaseOne()
 	backRepo.BackRepoDataset.CheckoutPhaseOne()
 	backRepo.BackRepoLabel.CheckoutPhaseOne()
 
 	// insertion point for per struct back repo phase two commit
-	backRepo.BackRepoChart.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoChartConfiguration.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoDataPoint.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoDataset.CheckoutPhaseTwo(backRepo)
@@ -127,7 +120,6 @@ func (backRepo *BackRepoStruct) Backup(stage *models.StageStruct, dirPath string
 	os.MkdirAll(dirPath, os.ModePerm)
 
 	// insertion point for per struct backup
-	backRepo.BackRepoChart.Backup(dirPath)
 	backRepo.BackRepoChartConfiguration.Backup(dirPath)
 	backRepo.BackRepoDataPoint.Backup(dirPath)
 	backRepo.BackRepoDataset.Backup(dirPath)
@@ -142,7 +134,6 @@ func (backRepo *BackRepoStruct) BackupXL(stage *models.StageStruct, dirPath stri
 	file := xlsx.NewFile()
 
 	// insertion point for per struct backup
-	backRepo.BackRepoChart.BackupXL(file)
 	backRepo.BackRepoChartConfiguration.BackupXL(file)
 	backRepo.BackRepoDataPoint.BackupXL(file)
 	backRepo.BackRepoDataset.BackupXL(file)
@@ -171,7 +162,6 @@ func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath strin
 	//
 
 	// insertion point for per struct backup
-	backRepo.BackRepoChart.RestorePhaseOne(dirPath)
 	backRepo.BackRepoChartConfiguration.RestorePhaseOne(dirPath)
 	backRepo.BackRepoDataPoint.RestorePhaseOne(dirPath)
 	backRepo.BackRepoDataset.RestorePhaseOne(dirPath)
@@ -182,7 +172,6 @@ func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath strin
 	//
 
 	// insertion point for per struct backup
-	backRepo.BackRepoChart.RestorePhaseTwo()
 	backRepo.BackRepoChartConfiguration.RestorePhaseTwo()
 	backRepo.BackRepoDataPoint.RestorePhaseTwo()
 	backRepo.BackRepoDataset.RestorePhaseTwo()
@@ -213,7 +202,6 @@ func (backRepo *BackRepoStruct) RestoreXL(stage *models.StageStruct, dirPath str
 	//
 
 	// insertion point for per struct backup
-	backRepo.BackRepoChart.RestoreXLPhaseOne(file)
 	backRepo.BackRepoChartConfiguration.RestoreXLPhaseOne(file)
 	backRepo.BackRepoDataPoint.RestoreXLPhaseOne(file)
 	backRepo.BackRepoDataset.RestoreXLPhaseOne(file)

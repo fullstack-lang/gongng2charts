@@ -2,10 +2,6 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 // insertion point for imports
-import { ChartsTableComponent } from './charts-table/charts-table.component'
-import { ChartDetailComponent } from './chart-detail/chart-detail.component'
-import { ChartPresentationComponent } from './chart-presentation/chart-presentation.component'
-
 import { ChartConfigurationsTableComponent } from './chartconfigurations-table/chartconfigurations-table.component'
 import { ChartConfigurationDetailComponent } from './chartconfiguration-detail/chartconfiguration-detail.component'
 import { ChartConfigurationPresentationComponent } from './chartconfiguration-presentation/chartconfiguration-presentation.component'
@@ -24,13 +20,6 @@ import { LabelPresentationComponent } from './label-presentation/label-presentat
 
 
 const routes: Routes = [ // insertion point for routes declarations
-	{ path: 'github_com_fullstack_lang_gongng2charts_go-charts', component: ChartsTableComponent, outlet: 'github_com_fullstack_lang_gongng2charts_go_table' },
-	{ path: 'github_com_fullstack_lang_gongng2charts_go-chart-adder', component: ChartDetailComponent, outlet: 'github_com_fullstack_lang_gongng2charts_go_editor' },
-	{ path: 'github_com_fullstack_lang_gongng2charts_go-chart-adder/:id/:originStruct/:originStructFieldName', component: ChartDetailComponent, outlet: 'github_com_fullstack_lang_gongng2charts_go_editor' },
-	{ path: 'github_com_fullstack_lang_gongng2charts_go-chart-detail/:id', component: ChartDetailComponent, outlet: 'github_com_fullstack_lang_gongng2charts_go_editor' },
-	{ path: 'github_com_fullstack_lang_gongng2charts_go-chart-presentation/:id', component: ChartPresentationComponent, outlet: 'github_com_fullstack_lang_gongng2charts_go_presentation' },
-	{ path: 'github_com_fullstack_lang_gongng2charts_go-chart-presentation-special/:id', component: ChartPresentationComponent, outlet: 'github_com_fullstack_lang_gongng2charts_gochartpres' },
-
 	{ path: 'github_com_fullstack_lang_gongng2charts_go-chartconfigurations', component: ChartConfigurationsTableComponent, outlet: 'github_com_fullstack_lang_gongng2charts_go_table' },
 	{ path: 'github_com_fullstack_lang_gongng2charts_go-chartconfiguration-adder', component: ChartConfigurationDetailComponent, outlet: 'github_com_fullstack_lang_gongng2charts_go_editor' },
 	{ path: 'github_com_fullstack_lang_gongng2charts_go-chartconfiguration-adder/:id/:originStruct/:originStructFieldName', component: ChartConfigurationDetailComponent, outlet: 'github_com_fullstack_lang_gongng2charts_go_editor' },

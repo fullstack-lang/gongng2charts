@@ -47,6 +47,16 @@
             </button>
         </mat-grid-tile>
     </mat-grid-list>
+    <!-- -->
+    <mat-form-field appearance="fill" class="detail-full-width">
+        <mat-label>ChartType</mat-label>
+        <mat-select [(ngModel)]="chartconfiguration.ChartType" [ngModelOptions]="{standalone: true}">
+            <mat-option *ngFor="let enum of ChartTypeList" [value]="enum.value">
+                {{enum.viewValue}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
     <div class="details__save">
         <button mat-raised-button color="primary" (click)="save()">
             Save chartconfiguration

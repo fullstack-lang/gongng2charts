@@ -12,6 +12,7 @@ export class DatasetDB {
 
 	// insertion point for basic fields declarations
 	Name: string = ""
+	Label: string = ""
 
 	// insertion point for other declarations
 	DataPoints?: Array<DataPointDB>

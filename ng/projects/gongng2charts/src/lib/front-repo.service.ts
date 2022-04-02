@@ -4,9 +4,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, combineLatest, BehaviorSubject } from 'rxjs';
 
 // insertion point sub template for services imports 
-import { ChartDB } from './chart-db'
-import { ChartService } from './chart.service'
-
 import { ChartConfigurationDB } from './chartconfiguration-db'
 import { ChartConfigurationService } from './chartconfiguration.service'
 
@@ -22,9 +19,6 @@ import { LabelService } from './label.service'
 
 // FrontRepo stores all instances in a front repository (design pattern repository)
 export class FrontRepo { // insertion point sub template 
-  Charts_array = new Array<ChartDB>(); // array of repo instances
-  Charts = new Map<number, ChartDB>(); // map of repo instances
-  Charts_batch = new Map<number, ChartDB>(); // same but only in last GET (for finding repo instances to delete)
   ChartConfigurations_array = new Array<ChartConfigurationDB>(); // array of repo instances
   ChartConfigurations = new Map<number, ChartConfigurationDB>(); // map of repo instances
   ChartConfigurations_batch = new Map<number, ChartConfigurationDB>(); // same but only in last GET (for finding repo instances to delete)
@@ -95,7 +89,6 @@ export class FrontRepoService {
 
   constructor(
     private http: HttpClient, // insertion point sub template 
-    private chartService: ChartService,
     private chartconfigurationService: ChartConfigurationService,
     private datapointService: DataPointService,
     private datasetService: DatasetService,
@@ -130,13 +123,11 @@ export class FrontRepoService {
 
   // typing of observable can be messy in typescript. Therefore, one force the type
   observableFrontRepo: [ // insertion point sub template 
-    Observable<ChartDB[]>,
     Observable<ChartConfigurationDB[]>,
     Observable<DataPointDB[]>,
     Observable<DatasetDB[]>,
     Observable<LabelDB[]>,
   ] = [ // insertion point sub template 
-      this.chartService.getCharts(),
       this.chartconfigurationService.getChartConfigurations(),
       this.datapointService.getDataPoints(),
       this.datasetService.getDatasets(),
@@ -156,7 +147,6 @@ export class FrontRepoService {
           this.observableFrontRepo
         ).subscribe(
           ([ // insertion point sub template for declarations 
-            charts_,
             chartconfigurations_,
             datapoints_,
             datasets_,
@@ -164,8 +154,6 @@ export class FrontRepoService {
           ]) => {
             // Typing can be messy with many items. Therefore, type casting is necessary here
             // insertion point sub template for type casting 
-            var charts: ChartDB[]
-            charts = charts_ as ChartDB[]
             var chartconfigurations: ChartConfigurationDB[]
             chartconfigurations = chartconfigurations_ as ChartConfigurationDB[]
             var datapoints: DataPointDB[]
@@ -178,39 +166,6 @@ export class FrontRepoService {
             // 
             // First Step: init map of instances
             // insertion point sub template for init 
-            // init the array
-            FrontRepoSingloton.Charts_array = charts
-
-            // clear the map that counts Chart in the GET
-            FrontRepoSingloton.Charts_batch.clear()
-
-            charts.forEach(
-              chart => {
-                FrontRepoSingloton.Charts.set(chart.ID, chart)
-                FrontRepoSingloton.Charts_batch.set(chart.ID, chart)
-              }
-            )
-
-            // clear charts that are absent from the batch
-            FrontRepoSingloton.Charts.forEach(
-              chart => {
-                if (FrontRepoSingloton.Charts_batch.get(chart.ID) == undefined) {
-                  FrontRepoSingloton.Charts.delete(chart.ID)
-                }
-              }
-            )
-
-            // sort Charts_array array
-            FrontRepoSingloton.Charts_array.sort((t1, t2) => {
-              if (t1.Name > t2.Name) {
-                return 1;
-              }
-              if (t1.Name < t2.Name) {
-                return -1;
-              }
-              return 0;
-            });
-
             // init the array
             FrontRepoSingloton.ChartConfigurations_array = chartconfigurations
 
@@ -347,13 +302,6 @@ export class FrontRepoService {
             // 
             // Second Step: redeem pointers between instances (thanks to maps in the First Step)
             // insertion point sub template for redeem 
-            charts.forEach(
-              chart => {
-                // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
-
-                // insertion point for redeeming ONE-MANY associations
-              }
-            )
             chartconfigurations.forEach(
               chartconfiguration => {
                 // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
@@ -431,57 +379,6 @@ export class FrontRepoService {
   }
 
   // insertion point for pull per struct 
-
-  // ChartPull performs a GET on Chart of the stack and redeem association pointers 
-  ChartPull(): Observable<FrontRepo> {
-    return new Observable<FrontRepo>(
-      (observer) => {
-        combineLatest([
-          this.chartService.getCharts()
-        ]).subscribe(
-          ([ // insertion point sub template 
-            charts,
-          ]) => {
-            // init the array
-            FrontRepoSingloton.Charts_array = charts
-
-            // clear the map that counts Chart in the GET
-            FrontRepoSingloton.Charts_batch.clear()
-
-            // 
-            // First Step: init map of instances
-            // insertion point sub template 
-            charts.forEach(
-              chart => {
-                FrontRepoSingloton.Charts.set(chart.ID, chart)
-                FrontRepoSingloton.Charts_batch.set(chart.ID, chart)
-
-                // insertion point for redeeming ONE/ZERO-ONE associations
-
-                // insertion point for redeeming ONE-MANY associations
-              }
-            )
-
-            // clear charts that are absent from the GET
-            FrontRepoSingloton.Charts.forEach(
-              chart => {
-                if (FrontRepoSingloton.Charts_batch.get(chart.ID) == undefined) {
-                  FrontRepoSingloton.Charts.delete(chart.ID)
-                }
-              }
-            )
-
-            // 
-            // Second Step: redeem pointers between instances (thanks to maps in the First Step)
-            // insertion point sub template 
-
-            // hand over control flow to observer
-            observer.next(FrontRepoSingloton)
-          }
-        )
-      }
-    )
-  }
 
   // ChartConfigurationPull performs a GET on ChartConfiguration of the stack and redeem association pointers 
   ChartConfigurationPull(): Observable<FrontRepo> {
@@ -728,18 +625,15 @@ export class FrontRepoService {
 }
 
 // insertion point for get unique ID per struct 
-export function getChartUniqueID(id: number): number {
+export function getChartConfigurationUniqueID(id: number): number {
   return 31 * id
 }
-export function getChartConfigurationUniqueID(id: number): number {
+export function getDataPointUniqueID(id: number): number {
   return 37 * id
 }
-export function getDataPointUniqueID(id: number): number {
+export function getDatasetUniqueID(id: number): number {
   return 41 * id
 }
-export function getDatasetUniqueID(id: number): number {
-  return 43 * id
-}
 export function getLabelUniqueID(id: number): number {
-  return 47 * id
+  return 43 * id
 }

@@ -1,6 +1,4 @@
 // insertion point sub template for components imports 
-  import { ChartsTableComponent } from './charts-table/charts-table.component'
-  import { ChartSortingComponent } from './chart-sorting/chart-sorting.component'
   import { ChartConfigurationsTableComponent } from './chartconfigurations-table/chartconfigurations-table.component'
   import { ChartConfigurationSortingComponent } from './chartconfiguration-sorting/chartconfiguration-sorting.component'
   import { DataPointsTableComponent } from './datapoints-table/datapoints-table.component'
@@ -11,8 +9,6 @@
   import { LabelSortingComponent } from './label-sorting/label-sorting.component'
 
 // insertion point sub template for map of components per struct 
-  export const MapOfChartsComponents: Map<string, any> = new Map([["ChartsTableComponent", ChartsTableComponent],])
-  export const MapOfChartSortingComponents: Map<string, any> = new Map([["ChartSortingComponent", ChartSortingComponent],])
   export const MapOfChartConfigurationsComponents: Map<string, any> = new Map([["ChartConfigurationsTableComponent", ChartConfigurationsTableComponent],])
   export const MapOfChartConfigurationSortingComponents: Map<string, any> = new Map([["ChartConfigurationSortingComponent", ChartConfigurationSortingComponent],])
   export const MapOfDataPointsComponents: Map<string, any> = new Map([["DataPointsTableComponent", DataPointsTableComponent],])
@@ -27,7 +23,6 @@ export const MapOfComponents: Map<string, any> =
   new Map(
     [
       // insertion point sub template for map of components 
-      ["Chart", MapOfChartsComponents],
       ["ChartConfiguration", MapOfChartConfigurationsComponents],
       ["DataPoint", MapOfDataPointsComponents],
       ["Dataset", MapOfDatasetsComponents],
@@ -40,7 +35,6 @@ export const MapOfSortingComponents: Map<string, any> =
   new Map(
     [
     // insertion point sub template for map of sorting components 
-      ["Chart", MapOfChartSortingComponents],
       ["ChartConfiguration", MapOfChartConfigurationSortingComponents],
       ["DataPoint", MapOfDataPointSortingComponents],
       ["Dataset", MapOfDatasetSortingComponents],

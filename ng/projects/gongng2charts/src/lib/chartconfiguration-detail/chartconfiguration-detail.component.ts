@@ -10,6 +10,7 @@ import { MapOfComponents } from '../map-components'
 import { MapOfSortingComponents } from '../map-components'
 
 // insertion point for imports
+import { ChartTypeSelect, ChartTypeList } from '../ChartType'
 
 import { Router, RouterState, ActivatedRoute } from '@angular/router';
 
@@ -33,6 +34,7 @@ enum ChartConfigurationDetailComponentState {
 export class ChartConfigurationDetailComponent implements OnInit {
 
 	// insertion point for declarations
+	ChartTypeList: ChartTypeSelect[] = []
 
 	// the ChartConfigurationDB of interest
 	chartconfiguration: ChartConfigurationDB = new ChartConfigurationDB
@@ -99,6 +101,7 @@ export class ChartConfigurationDetailComponent implements OnInit {
 		)
 
 		// insertion point for initialisation of enums list
+		this.ChartTypeList = ChartTypeList
 	}
 
 	getChartConfiguration(): void {

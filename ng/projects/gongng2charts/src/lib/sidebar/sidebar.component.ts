@@ -8,8 +8,6 @@ import { FrontRepoService, FrontRepo } from '../front-repo.service'
 import { CommitNbService } from '../commitnb.service'
 
 // insertion point for per struct import code
-import { ChartService } from '../chart.service'
-import { getChartUniqueID } from '../front-repo.service'
 import { ChartConfigurationService } from '../chartconfiguration.service'
 import { getChartConfigurationUniqueID } from '../front-repo.service'
 import { DataPointService } from '../datapoint.service'
@@ -153,7 +151,6 @@ export class SidebarComponent implements OnInit {
     private commitNbService: CommitNbService,
 
     // insertion point for per struct service declaration
-    private chartService: ChartService,
     private chartconfigurationService: ChartConfigurationService,
     private datapointService: DataPointService,
     private datasetService: DatasetService,
@@ -164,14 +161,6 @@ export class SidebarComponent implements OnInit {
     this.refresh()
 
     // insertion point for per struct observable for refresh trigger
-    // observable for changes in structs
-    this.chartService.ChartServiceChanged.subscribe(
-      message => {
-        if (message == "post" || message == "update" || message == "delete") {
-          this.refresh()
-        }
-      }
-    )
     // observable for changes in structs
     this.chartconfigurationService.ChartConfigurationServiceChanged.subscribe(
       message => {
@@ -228,50 +217,6 @@ export class SidebarComponent implements OnInit {
       this.gongNodeTree = new Array<GongNode>();
       
       // insertion point for per struct tree construction
-      /**
-      * fill up the Chart part of the mat tree
-      */
-      let chartGongNodeStruct: GongNode = {
-        name: "Chart",
-        type: GongNodeType.STRUCT,
-        id: 0,
-        uniqueIdPerStack: 13 * nonInstanceNodeId,
-        structName: "Chart",
-        associationField: "",
-        associatedStructName: "",
-        children: new Array<GongNode>()
-      }
-      nonInstanceNodeId = nonInstanceNodeId + 1
-      this.gongNodeTree.push(chartGongNodeStruct)
-
-      this.frontRepo.Charts_array.sort((t1, t2) => {
-        if (t1.Name > t2.Name) {
-          return 1;
-        }
-        if (t1.Name < t2.Name) {
-          return -1;
-        }
-        return 0;
-      });
-
-      this.frontRepo.Charts_array.forEach(
-        chartDB => {
-          let chartGongNodeInstance: GongNode = {
-            name: chartDB.Name,
-            type: GongNodeType.INSTANCE,
-            id: chartDB.ID,
-            uniqueIdPerStack: getChartUniqueID(chartDB.ID),
-            structName: "Chart",
-            associationField: "",
-            associatedStructName: "",
-            children: new Array<GongNode>()
-          }
-          chartGongNodeStruct.children!.push(chartGongNodeInstance)
-
-          // insertion point for per field code
-        }
-      )
-
       /**
       * fill up the ChartConfiguration part of the mat tree
       */

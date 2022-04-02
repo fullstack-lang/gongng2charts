@@ -66,6 +66,9 @@ type DatasetDB struct {
 
 	// Declation for basic field datasetDB.Name {{BasicKind}} (to be completed)
 	Name_Data sql.NullString
+
+	// Declation for basic field datasetDB.Label {{BasicKind}} (to be completed)
+	Label_Data sql.NullString
 	// encoding of pointers
 	DatasetPointersEnconding
 }
@@ -88,6 +91,8 @@ type DatasetWOP struct {
 	// insertion for WOP basic fields
 
 	Name string `xlsx:"1"`
+
+	Label string `xlsx:"2"`
 	// insertion for WOP pointer fields
 }
 
@@ -95,6 +100,7 @@ var Dataset_Fields = []string{
 	// insertion for WOP basic fields
 	"ID",
 	"Name",
+	"Label",
 }
 
 type BackRepoDatasetStruct struct {
@@ -424,6 +430,9 @@ func (datasetDB *DatasetDB) CopyBasicFieldsFromDataset(dataset *models.Dataset) 
 
 	datasetDB.Name_Data.String = dataset.Name
 	datasetDB.Name_Data.Valid = true
+
+	datasetDB.Label_Data.String = dataset.Label
+	datasetDB.Label_Data.Valid = true
 }
 
 // CopyBasicFieldsFromDatasetWOP
@@ -432,12 +441,16 @@ func (datasetDB *DatasetDB) CopyBasicFieldsFromDatasetWOP(dataset *DatasetWOP) {
 
 	datasetDB.Name_Data.String = dataset.Name
 	datasetDB.Name_Data.Valid = true
+
+	datasetDB.Label_Data.String = dataset.Label
+	datasetDB.Label_Data.Valid = true
 }
 
 // CopyBasicFieldsToDataset
 func (datasetDB *DatasetDB) CopyBasicFieldsToDataset(dataset *models.Dataset) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	dataset.Name = datasetDB.Name_Data.String
+	dataset.Label = datasetDB.Label_Data.String
 }
 
 // CopyBasicFieldsToDatasetWOP
@@ -445,6 +458,7 @@ func (datasetDB *DatasetDB) CopyBasicFieldsToDatasetWOP(dataset *DatasetWOP) {
 	dataset.ID = int(datasetDB.ID)
 	// insertion point for checkout of basic fields (back repo to stage)
 	dataset.Name = datasetDB.Name_Data.String
+	dataset.Label = datasetDB.Label_Data.String
 }
 
 // Backup generates a json file from a slice of all DatasetDB instances in the backrepo
