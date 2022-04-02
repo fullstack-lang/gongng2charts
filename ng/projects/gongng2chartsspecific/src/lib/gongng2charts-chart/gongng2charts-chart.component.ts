@@ -10,6 +10,9 @@ import { BaseChartDirective } from 'ng2-charts';
 })
 export class Gongng2chartsChartComponent implements OnInit {
 
+  width = 600
+  height = 600
+
   public lineChartData: ChartConfiguration['data'] = {
     datasets: [
       {
