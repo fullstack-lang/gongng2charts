@@ -12,6 +12,7 @@ import { Gongng2chartsChartComponent } from './gongng2charts-chart/gongng2charts
   imports: [
   ],
   exports: [
+    Gongng2chartsspecificComponent,
     Gongng2chartsspecificComponent
   ]
 })
