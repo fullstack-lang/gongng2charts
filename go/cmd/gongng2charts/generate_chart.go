@@ -7,7 +7,7 @@ import (
 	gongng2charts_models "github.com/fullstack-lang/gongng2charts/go/models"
 )
 
-const NbPoints = 10
+const NbPoints = 20
 
 func GenerateChart() {
 
