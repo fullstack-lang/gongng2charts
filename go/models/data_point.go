@@ -1,6 +1,6 @@
 package models
 
-type Data struct {
+type DataPoint struct {
 	Name  string
 	Value float64
 }

@@ -10,6 +10,14 @@ import { CommitNbService } from '../commitnb.service'
 // insertion point for per struct import code
 import { ChartService } from '../chart.service'
 import { getChartUniqueID } from '../front-repo.service'
+import { ChartConfigurationService } from '../chartconfiguration.service'
+import { getChartConfigurationUniqueID } from '../front-repo.service'
+import { DataPointService } from '../datapoint.service'
+import { getDataPointUniqueID } from '../front-repo.service'
+import { DatasetService } from '../dataset.service'
+import { getDatasetUniqueID } from '../front-repo.service'
+import { LabelService } from '../label.service'
+import { getLabelUniqueID } from '../front-repo.service'
 
 /**
  * Types of a GongNode / GongFlatNode
@@ -146,6 +154,10 @@ export class SidebarComponent implements OnInit {
 
     // insertion point for per struct service declaration
     private chartService: ChartService,
+    private chartconfigurationService: ChartConfigurationService,
+    private datapointService: DataPointService,
+    private datasetService: DatasetService,
+    private labelService: LabelService,
   ) { }
 
   ngOnInit(): void {
@@ -154,6 +166,38 @@ export class SidebarComponent implements OnInit {
     // insertion point for per struct observable for refresh trigger
     // observable for changes in structs
     this.chartService.ChartServiceChanged.subscribe(
+      message => {
+        if (message == "post" || message == "update" || message == "delete") {
+          this.refresh()
+        }
+      }
+    )
+    // observable for changes in structs
+    this.chartconfigurationService.ChartConfigurationServiceChanged.subscribe(
+      message => {
+        if (message == "post" || message == "update" || message == "delete") {
+          this.refresh()
+        }
+      }
+    )
+    // observable for changes in structs
+    this.datapointService.DataPointServiceChanged.subscribe(
+      message => {
+        if (message == "post" || message == "update" || message == "delete") {
+          this.refresh()
+        }
+      }
+    )
+    // observable for changes in structs
+    this.datasetService.DatasetServiceChanged.subscribe(
+      message => {
+        if (message == "post" || message == "update" || message == "delete") {
+          this.refresh()
+        }
+      }
+    )
+    // observable for changes in structs
+    this.labelService.LabelServiceChanged.subscribe(
       message => {
         if (message == "post" || message == "update" || message == "delete") {
           this.refresh()
@@ -223,6 +267,278 @@ export class SidebarComponent implements OnInit {
             children: new Array<GongNode>()
           }
           chartGongNodeStruct.children!.push(chartGongNodeInstance)
+
+          // insertion point for per field code
+        }
+      )
+
+      /**
+      * fill up the ChartConfiguration part of the mat tree
+      */
+      let chartconfigurationGongNodeStruct: GongNode = {
+        name: "ChartConfiguration",
+        type: GongNodeType.STRUCT,
+        id: 0,
+        uniqueIdPerStack: 13 * nonInstanceNodeId,
+        structName: "ChartConfiguration",
+        associationField: "",
+        associatedStructName: "",
+        children: new Array<GongNode>()
+      }
+      nonInstanceNodeId = nonInstanceNodeId + 1
+      this.gongNodeTree.push(chartconfigurationGongNodeStruct)
+
+      this.frontRepo.ChartConfigurations_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
+
+      this.frontRepo.ChartConfigurations_array.forEach(
+        chartconfigurationDB => {
+          let chartconfigurationGongNodeInstance: GongNode = {
+            name: chartconfigurationDB.Name,
+            type: GongNodeType.INSTANCE,
+            id: chartconfigurationDB.ID,
+            uniqueIdPerStack: getChartConfigurationUniqueID(chartconfigurationDB.ID),
+            structName: "ChartConfiguration",
+            associationField: "",
+            associatedStructName: "",
+            children: new Array<GongNode>()
+          }
+          chartconfigurationGongNodeStruct.children!.push(chartconfigurationGongNodeInstance)
+
+          // insertion point for per field code
+          /**
+          * let append a node for the slide of pointer Datasets
+          */
+          let DatasetsGongNodeAssociation: GongNode = {
+            name: "(Dataset) Datasets",
+            type: GongNodeType.ONE__ZERO_MANY_ASSOCIATION,
+            id: chartconfigurationDB.ID,
+            uniqueIdPerStack: 19 * nonInstanceNodeId,
+            structName: "ChartConfiguration",
+            associationField: "Datasets",
+            associatedStructName: "Dataset",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          chartconfigurationGongNodeInstance.children.push(DatasetsGongNodeAssociation)
+
+          chartconfigurationDB.Datasets?.forEach(datasetDB => {
+            let datasetNode: GongNode = {
+              name: datasetDB.Name,
+              type: GongNodeType.INSTANCE,
+              id: datasetDB.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                7 * getChartConfigurationUniqueID(chartconfigurationDB.ID)
+                + 11 * getDatasetUniqueID(datasetDB.ID),
+              structName: "Dataset",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            DatasetsGongNodeAssociation.children.push(datasetNode)
+          })
+
+          /**
+          * let append a node for the slide of pointer Labels
+          */
+          let LabelsGongNodeAssociation: GongNode = {
+            name: "(Label) Labels",
+            type: GongNodeType.ONE__ZERO_MANY_ASSOCIATION,
+            id: chartconfigurationDB.ID,
+            uniqueIdPerStack: 19 * nonInstanceNodeId,
+            structName: "ChartConfiguration",
+            associationField: "Labels",
+            associatedStructName: "Label",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          chartconfigurationGongNodeInstance.children.push(LabelsGongNodeAssociation)
+
+          chartconfigurationDB.Labels?.forEach(labelDB => {
+            let labelNode: GongNode = {
+              name: labelDB.Name,
+              type: GongNodeType.INSTANCE,
+              id: labelDB.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                7 * getChartConfigurationUniqueID(chartconfigurationDB.ID)
+                + 11 * getLabelUniqueID(labelDB.ID),
+              structName: "Label",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            LabelsGongNodeAssociation.children.push(labelNode)
+          })
+
+        }
+      )
+
+      /**
+      * fill up the DataPoint part of the mat tree
+      */
+      let datapointGongNodeStruct: GongNode = {
+        name: "DataPoint",
+        type: GongNodeType.STRUCT,
+        id: 0,
+        uniqueIdPerStack: 13 * nonInstanceNodeId,
+        structName: "DataPoint",
+        associationField: "",
+        associatedStructName: "",
+        children: new Array<GongNode>()
+      }
+      nonInstanceNodeId = nonInstanceNodeId + 1
+      this.gongNodeTree.push(datapointGongNodeStruct)
+
+      this.frontRepo.DataPoints_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
+
+      this.frontRepo.DataPoints_array.forEach(
+        datapointDB => {
+          let datapointGongNodeInstance: GongNode = {
+            name: datapointDB.Name,
+            type: GongNodeType.INSTANCE,
+            id: datapointDB.ID,
+            uniqueIdPerStack: getDataPointUniqueID(datapointDB.ID),
+            structName: "DataPoint",
+            associationField: "",
+            associatedStructName: "",
+            children: new Array<GongNode>()
+          }
+          datapointGongNodeStruct.children!.push(datapointGongNodeInstance)
+
+          // insertion point for per field code
+        }
+      )
+
+      /**
+      * fill up the Dataset part of the mat tree
+      */
+      let datasetGongNodeStruct: GongNode = {
+        name: "Dataset",
+        type: GongNodeType.STRUCT,
+        id: 0,
+        uniqueIdPerStack: 13 * nonInstanceNodeId,
+        structName: "Dataset",
+        associationField: "",
+        associatedStructName: "",
+        children: new Array<GongNode>()
+      }
+      nonInstanceNodeId = nonInstanceNodeId + 1
+      this.gongNodeTree.push(datasetGongNodeStruct)
+
+      this.frontRepo.Datasets_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
+
+      this.frontRepo.Datasets_array.forEach(
+        datasetDB => {
+          let datasetGongNodeInstance: GongNode = {
+            name: datasetDB.Name,
+            type: GongNodeType.INSTANCE,
+            id: datasetDB.ID,
+            uniqueIdPerStack: getDatasetUniqueID(datasetDB.ID),
+            structName: "Dataset",
+            associationField: "",
+            associatedStructName: "",
+            children: new Array<GongNode>()
+          }
+          datasetGongNodeStruct.children!.push(datasetGongNodeInstance)
+
+          // insertion point for per field code
+          /**
+          * let append a node for the slide of pointer DataPoints
+          */
+          let DataPointsGongNodeAssociation: GongNode = {
+            name: "(DataPoint) DataPoints",
+            type: GongNodeType.ONE__ZERO_MANY_ASSOCIATION,
+            id: datasetDB.ID,
+            uniqueIdPerStack: 19 * nonInstanceNodeId,
+            structName: "Dataset",
+            associationField: "DataPoints",
+            associatedStructName: "DataPoint",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          datasetGongNodeInstance.children.push(DataPointsGongNodeAssociation)
+
+          datasetDB.DataPoints?.forEach(datapointDB => {
+            let datapointNode: GongNode = {
+              name: datapointDB.Name,
+              type: GongNodeType.INSTANCE,
+              id: datapointDB.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                7 * getDatasetUniqueID(datasetDB.ID)
+                + 11 * getDataPointUniqueID(datapointDB.ID),
+              structName: "DataPoint",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            DataPointsGongNodeAssociation.children.push(datapointNode)
+          })
+
+        }
+      )
+
+      /**
+      * fill up the Label part of the mat tree
+      */
+      let labelGongNodeStruct: GongNode = {
+        name: "Label",
+        type: GongNodeType.STRUCT,
+        id: 0,
+        uniqueIdPerStack: 13 * nonInstanceNodeId,
+        structName: "Label",
+        associationField: "",
+        associatedStructName: "",
+        children: new Array<GongNode>()
+      }
+      nonInstanceNodeId = nonInstanceNodeId + 1
+      this.gongNodeTree.push(labelGongNodeStruct)
+
+      this.frontRepo.Labels_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
+
+      this.frontRepo.Labels_array.forEach(
+        labelDB => {
+          let labelGongNodeInstance: GongNode = {
+            name: labelDB.Name,
+            type: GongNodeType.INSTANCE,
+            id: labelDB.ID,
+            uniqueIdPerStack: getLabelUniqueID(labelDB.ID),
+            structName: "Label",
+            associationField: "",
+            associatedStructName: "",
+            children: new Array<GongNode>()
+          }
+          labelGongNodeStruct.children!.push(labelGongNodeInstance)
 
           // insertion point for per field code
         }

@@ -1,6 +1,6 @@
 package models
 
 type Dataset struct {
-	Name  string
-	Datas []*Data
+	Name       string
+	DataPoints []*DataPoint
 }

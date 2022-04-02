@@ -55,9 +55,6 @@ var Chart uml.Classdiagram = uml.Classdiagram{
 				{
 					Field: models.Data{}.Name,
 				},
-				{
-					Field: models.Data{}.Value,
-				},
 			},
 		},
 		{

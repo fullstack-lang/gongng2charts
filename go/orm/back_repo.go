@@ -21,6 +21,14 @@ type BackRepoStruct struct {
 	// insertion point for per struct back repo declarations
 	BackRepoChart BackRepoChartStruct
 
+	BackRepoChartConfiguration BackRepoChartConfigurationStruct
+
+	BackRepoDataPoint BackRepoDataPointStruct
+
+	BackRepoDataset BackRepoDatasetStruct
+
+	BackRepoLabel BackRepoLabelStruct
+
 	CommitFromBackNb uint // this ng is updated at the BackRepo level but also at the BackRepo<GongStruct> level
 
 	PushFromFrontNb uint // records increments from push from front
@@ -60,6 +68,10 @@ func (backRepo *BackRepoStruct) IncrementPushFromFrontNb() uint {
 func (backRepo *BackRepoStruct) init(db *gorm.DB) {
 	// insertion point for per struct back repo declarations
 	backRepo.BackRepoChart.Init(db)
+	backRepo.BackRepoChartConfiguration.Init(db)
+	backRepo.BackRepoDataPoint.Init(db)
+	backRepo.BackRepoDataset.Init(db)
+	backRepo.BackRepoLabel.Init(db)
 
 	models.Stage.BackRepo = backRepo
 }
@@ -68,9 +80,17 @@ func (backRepo *BackRepoStruct) init(db *gorm.DB) {
 func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 	// insertion point for per struct back repo phase one commit
 	backRepo.BackRepoChart.CommitPhaseOne(stage)
+	backRepo.BackRepoChartConfiguration.CommitPhaseOne(stage)
+	backRepo.BackRepoDataPoint.CommitPhaseOne(stage)
+	backRepo.BackRepoDataset.CommitPhaseOne(stage)
+	backRepo.BackRepoLabel.CommitPhaseOne(stage)
 
 	// insertion point for per struct back repo phase two commit
 	backRepo.BackRepoChart.CommitPhaseTwo(backRepo)
+	backRepo.BackRepoChartConfiguration.CommitPhaseTwo(backRepo)
+	backRepo.BackRepoDataPoint.CommitPhaseTwo(backRepo)
+	backRepo.BackRepoDataset.CommitPhaseTwo(backRepo)
+	backRepo.BackRepoLabel.CommitPhaseTwo(backRepo)
 
 	backRepo.IncrementCommitFromBackNb()
 }
@@ -79,9 +99,17 @@ func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 func (backRepo *BackRepoStruct) Checkout(stage *models.StageStruct) {
 	// insertion point for per struct back repo phase one commit
 	backRepo.BackRepoChart.CheckoutPhaseOne()
+	backRepo.BackRepoChartConfiguration.CheckoutPhaseOne()
+	backRepo.BackRepoDataPoint.CheckoutPhaseOne()
+	backRepo.BackRepoDataset.CheckoutPhaseOne()
+	backRepo.BackRepoLabel.CheckoutPhaseOne()
 
 	// insertion point for per struct back repo phase two commit
 	backRepo.BackRepoChart.CheckoutPhaseTwo(backRepo)
+	backRepo.BackRepoChartConfiguration.CheckoutPhaseTwo(backRepo)
+	backRepo.BackRepoDataPoint.CheckoutPhaseTwo(backRepo)
+	backRepo.BackRepoDataset.CheckoutPhaseTwo(backRepo)
+	backRepo.BackRepoLabel.CheckoutPhaseTwo(backRepo)
 }
 
 var BackRepo BackRepoStruct
@@ -100,6 +128,10 @@ func (backRepo *BackRepoStruct) Backup(stage *models.StageStruct, dirPath string
 
 	// insertion point for per struct backup
 	backRepo.BackRepoChart.Backup(dirPath)
+	backRepo.BackRepoChartConfiguration.Backup(dirPath)
+	backRepo.BackRepoDataPoint.Backup(dirPath)
+	backRepo.BackRepoDataset.Backup(dirPath)
+	backRepo.BackRepoLabel.Backup(dirPath)
 }
 
 // Backup in XL the BackRepoStruct
@@ -111,6 +143,10 @@ func (backRepo *BackRepoStruct) BackupXL(stage *models.StageStruct, dirPath stri
 
 	// insertion point for per struct backup
 	backRepo.BackRepoChart.BackupXL(file)
+	backRepo.BackRepoChartConfiguration.BackupXL(file)
+	backRepo.BackRepoDataPoint.BackupXL(file)
+	backRepo.BackRepoDataset.BackupXL(file)
+	backRepo.BackRepoLabel.BackupXL(file)
 
 	var b bytes.Buffer
 	writer := bufio.NewWriter(&b)
@@ -136,6 +172,10 @@ func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath strin
 
 	// insertion point for per struct backup
 	backRepo.BackRepoChart.RestorePhaseOne(dirPath)
+	backRepo.BackRepoChartConfiguration.RestorePhaseOne(dirPath)
+	backRepo.BackRepoDataPoint.RestorePhaseOne(dirPath)
+	backRepo.BackRepoDataset.RestorePhaseOne(dirPath)
+	backRepo.BackRepoLabel.RestorePhaseOne(dirPath)
 
 	//
 	// restauration second phase (reindex pointers with the new ID)
@@ -143,6 +183,10 @@ func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath strin
 
 	// insertion point for per struct backup
 	backRepo.BackRepoChart.RestorePhaseTwo()
+	backRepo.BackRepoChartConfiguration.RestorePhaseTwo()
+	backRepo.BackRepoDataPoint.RestorePhaseTwo()
+	backRepo.BackRepoDataset.RestorePhaseTwo()
+	backRepo.BackRepoLabel.RestorePhaseTwo()
 
 	models.Stage.Checkout()
 }
@@ -170,6 +214,10 @@ func (backRepo *BackRepoStruct) RestoreXL(stage *models.StageStruct, dirPath str
 
 	// insertion point for per struct backup
 	backRepo.BackRepoChart.RestoreXLPhaseOne(file)
+	backRepo.BackRepoChartConfiguration.RestoreXLPhaseOne(file)
+	backRepo.BackRepoDataPoint.RestoreXLPhaseOne(file)
+	backRepo.BackRepoDataset.RestoreXLPhaseOne(file)
+	backRepo.BackRepoLabel.RestoreXLPhaseOne(file)
 
 	// commit the restored stage
 	models.Stage.Commit()

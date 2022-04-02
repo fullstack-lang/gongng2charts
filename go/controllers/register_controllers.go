@@ -50,6 +50,34 @@ func RegisterControllers(r *gin.Engine) {
 		v1.PUT("/v1/charts/:id", UpdateChart)
 		v1.DELETE("/v1/charts/:id", DeleteChart)
 
+		v1.GET("/v1/chartconfigurations", GetChartConfigurations)
+		v1.GET("/v1/chartconfigurations/:id", GetChartConfiguration)
+		v1.POST("/v1/chartconfigurations", PostChartConfiguration)
+		v1.PATCH("/v1/chartconfigurations/:id", UpdateChartConfiguration)
+		v1.PUT("/v1/chartconfigurations/:id", UpdateChartConfiguration)
+		v1.DELETE("/v1/chartconfigurations/:id", DeleteChartConfiguration)
+
+		v1.GET("/v1/datapoints", GetDataPoints)
+		v1.GET("/v1/datapoints/:id", GetDataPoint)
+		v1.POST("/v1/datapoints", PostDataPoint)
+		v1.PATCH("/v1/datapoints/:id", UpdateDataPoint)
+		v1.PUT("/v1/datapoints/:id", UpdateDataPoint)
+		v1.DELETE("/v1/datapoints/:id", DeleteDataPoint)
+
+		v1.GET("/v1/datasets", GetDatasets)
+		v1.GET("/v1/datasets/:id", GetDataset)
+		v1.POST("/v1/datasets", PostDataset)
+		v1.PATCH("/v1/datasets/:id", UpdateDataset)
+		v1.PUT("/v1/datasets/:id", UpdateDataset)
+		v1.DELETE("/v1/datasets/:id", DeleteDataset)
+
+		v1.GET("/v1/labels", GetLabels)
+		v1.GET("/v1/labels/:id", GetLabel)
+		v1.POST("/v1/labels", PostLabel)
+		v1.PATCH("/v1/labels/:id", UpdateLabel)
+		v1.PUT("/v1/labels/:id", UpdateLabel)
+		v1.DELETE("/v1/labels/:id", DeleteLabel)
+
 		v1.GET("/commitfrombacknb", GetLastCommitFromBackNb)
 		v1.GET("/pushfromfrontnb", GetLastPushFromFrontNb)
 	}

@@ -34,15 +34,14 @@ import (
 )
 
 var (
-	logDBFlag         = flag.Bool("logDB", false, "log mode for db")
-	logGINFlag        = flag.Bool("logGIN", false, "log mode for gin")
+	logDBFlag  = flag.Bool("logDB", false, "log mode for db")
+	logGINFlag = flag.Bool("logGIN", false, "log mode for gin")
 
 	marshallOnStartup = flag.String("marshallOnStartup", "", "at startup, marshall staged data to a go file with the marshall name and '.go' (must be lowercased without spaces). If marshall arg is '', no marshalling")
 	unmarshall        = flag.String("unmarshall", "", "unmarshall data from marshall name and '.go' (must be lowercased without spaces), If unmarshall arg is '', no unmarshalling")
 	marshallOnCommit  = flag.String("marshallOnCommit", "", "on all commits, marshall staged data to a go file with the marshall name and '.go' (must be lowercased without spaces). If marshall arg is '', no marshalling")
 
 	diagrams = flag.Bool("diagrams", true, "parse/analysis go/models and go/diagrams (takes a few seconds)")
-
 )
 
 // InjectionGateway is the singloton that stores all functions
@@ -65,7 +64,6 @@ func (impl *BeforeCommitImplementation) BeforeCommit(stage *models.StageStruct) 
 	models.Stage.Marshall(file, "github.com/fullstack-lang/gongng2charts/go/models", "main")
 }
 
-
 func main() {
 
 	log.SetPrefix("gongng2charts: ")
@@ -83,14 +81,14 @@ func main() {
 	r.Use(cors.Default())
 
 	// setup GORM
-	db := orm.SetupModels(*logDBFlag, "./test.db")
+	db := orm.SetupModels(*logDBFlag, "file:memdb1?mode=memory&cache=shared")
 	dbDB, err := db.DB()
-	
+
 	//
 	// gong and gongdoc databases do not need to be persisted.
 	// therefore, they are in memory
 	//
-	db_inMemory := gong_orm.SetupModels(*logDBFlag, ":memory:")
+	db_inMemory := gong_orm.SetupModels(*logDBFlag, "file:memdb2?mode=memory&cache=shared")
 
 	// since gongsim is a multi threaded application. It is important to set up
 	// only one open connexion at a time
@@ -178,6 +176,8 @@ func main() {
 		pkgelt.Unmarshall(modelPkg.PkgPath, "../../diagrams")
 		pkgelt.SerializeToStage()
 	}
+
+	GenerateChart()
 
 	controllers.RegisterControllers(r)
 	gongdoc_controllers.RegisterControllers(r)

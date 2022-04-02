@@ -43,6 +43,26 @@ import { ChartSortingComponent } from './chart-sorting/chart-sorting.component'
 import { ChartDetailComponent } from './chart-detail/chart-detail.component'
 import { ChartPresentationComponent } from './chart-presentation/chart-presentation.component'
 
+import { ChartConfigurationsTableComponent } from './chartconfigurations-table/chartconfigurations-table.component'
+import { ChartConfigurationSortingComponent } from './chartconfiguration-sorting/chartconfiguration-sorting.component'
+import { ChartConfigurationDetailComponent } from './chartconfiguration-detail/chartconfiguration-detail.component'
+import { ChartConfigurationPresentationComponent } from './chartconfiguration-presentation/chartconfiguration-presentation.component'
+
+import { DataPointsTableComponent } from './datapoints-table/datapoints-table.component'
+import { DataPointSortingComponent } from './datapoint-sorting/datapoint-sorting.component'
+import { DataPointDetailComponent } from './datapoint-detail/datapoint-detail.component'
+import { DataPointPresentationComponent } from './datapoint-presentation/datapoint-presentation.component'
+
+import { DatasetsTableComponent } from './datasets-table/datasets-table.component'
+import { DatasetSortingComponent } from './dataset-sorting/dataset-sorting.component'
+import { DatasetDetailComponent } from './dataset-detail/dataset-detail.component'
+import { DatasetPresentationComponent } from './dataset-presentation/dataset-presentation.component'
+
+import { LabelsTableComponent } from './labels-table/labels-table.component'
+import { LabelSortingComponent } from './label-sorting/label-sorting.component'
+import { LabelDetailComponent } from './label-detail/label-detail.component'
+import { LabelPresentationComponent } from './label-presentation/label-presentation.component'
+
 
 @NgModule({
 	declarations: [
@@ -51,6 +71,26 @@ import { ChartPresentationComponent } from './chart-presentation/chart-presentat
 		ChartSortingComponent,
 		ChartDetailComponent,
 		ChartPresentationComponent,
+
+		ChartConfigurationsTableComponent,
+		ChartConfigurationSortingComponent,
+		ChartConfigurationDetailComponent,
+		ChartConfigurationPresentationComponent,
+
+		DataPointsTableComponent,
+		DataPointSortingComponent,
+		DataPointDetailComponent,
+		DataPointPresentationComponent,
+
+		DatasetsTableComponent,
+		DatasetSortingComponent,
+		DatasetDetailComponent,
+		DatasetPresentationComponent,
+
+		LabelsTableComponent,
+		LabelSortingComponent,
+		LabelDetailComponent,
+		LabelPresentationComponent,
 
 
 		SplitterComponent,
@@ -95,6 +135,26 @@ import { ChartPresentationComponent } from './chart-presentation/chart-presentat
 		ChartSortingComponent,
 		ChartDetailComponent,
 		ChartPresentationComponent,
+
+		ChartConfigurationsTableComponent,
+		ChartConfigurationSortingComponent,
+		ChartConfigurationDetailComponent,
+		ChartConfigurationPresentationComponent,
+
+		DataPointsTableComponent,
+		DataPointSortingComponent,
+		DataPointDetailComponent,
+		DataPointPresentationComponent,
+
+		DatasetsTableComponent,
+		DatasetSortingComponent,
+		DatasetDetailComponent,
+		DatasetPresentationComponent,
+
+		LabelsTableComponent,
+		LabelSortingComponent,
+		LabelDetailComponent,
+		LabelPresentationComponent,
 
 
 		SplitterComponent,
