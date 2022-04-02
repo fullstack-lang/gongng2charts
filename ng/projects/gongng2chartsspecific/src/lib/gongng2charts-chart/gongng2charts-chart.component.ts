@@ -106,10 +106,12 @@ export class Gongng2chartsChartComponent implements OnInit {
     console.log(event, active);
   }
 
+  frontRepo: gongng2charts.FrontRepo = new gongng2charts.FrontRepo
 
   constructor(
     private gongng2chartsCommitNbService: gongng2charts.CommitNbService,
     private gongng2chartsPushFromFrontNbService: gongng2charts.PushFromFrontNbService,
+    private frontRepoService: gongng2charts.FrontRepoService,
   ) { }
 
   ngOnInit(): void {
@@ -143,18 +145,64 @@ export class Gongng2chartsChartComponent implements OnInit {
         )
       }
     )
+
+    this.refresh()
   }
 
+  chartConfig: gongng2charts.ChartConfigurationDB = new gongng2charts.ChartConfigurationDB
   refresh(): void {
-    // // get the singloton
-    // this.gongmarkdownMarkdownContentService.getMarkdownContents().subscribe(
-    //   markdownContentDBs => {
-    //     if (markdownContentDBs.length == 1) {
-    //       this.markdownContentDB = markdownContentDBs[0]
-    //     } else {
-    //       console.log("wrong number of markdown content " + markdownContentDBs.length)
-    //     }
-    //   }
-    // )
+
+    this.frontRepoService.pull().subscribe(
+      frontRepo => {
+        this.frontRepo = frontRepo
+        console.log("front repo ClassdiagramPull returned")
+
+        if (this.frontRepo.ChartConfigurations_array.length == 1) {
+          this.chartConfig = this.frontRepo.ChartConfigurations_array[0]
+        }
+
+        // reset
+        this.lineChartData.datasets = []
+        this.lineChartData.labels = []
+
+        for (let i = 0; i < this.chartConfig.Datasets!.length; i++) {
+
+          let dataset = this.chartConfig.Datasets![i]
+          // let datapoints = new Array<number>()
+          let datapoints: number[] = []
+
+          for (let j = 0; j < dataset.DataPoints!.length; j++) {
+            let datapoint = dataset.DataPoints![j]
+            datapoints.push(datapoint.Value)
+          }
+
+          this.lineChartData.datasets.push(
+            {
+              // data: [65, 59, 80, 81, 56, 55, 40],
+              data: datapoints,
+              label: 'Series A',
+              backgroundColor: 'rgba(148,159,177,0.2)',
+              borderColor: 'rgba(148,159,177,1)',
+              pointBackgroundColor: 'rgba(148,159,177,1)',
+              pointBorderColor: '#fff',
+              pointHoverBackgroundColor: '#fff',
+              pointHoverBorderColor: 'rgba(148,159,177,0.8)',
+              fill: 'origin',
+            },
+          )
+        }
+
+        for (let i = 0; i < this.chartConfig.Labels!.length; i++) {
+          let label = this.chartConfig.Labels![i]
+          this.lineChartData.labels.push(label.Name)
+        }
+
+        // this.lineChartData.labels = ['toto', 'February', 'March', 'April', 'May', 'June', 'July']
+
+        console.log("finished rendering")
+        this.chart?.update();
+      }
+    )
+
   }
 }
