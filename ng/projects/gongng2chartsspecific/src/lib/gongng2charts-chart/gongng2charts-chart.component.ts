@@ -3,6 +3,9 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ChartConfiguration, ChartEvent, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 
+import { Observable, timer } from 'rxjs';
+
+import * as gongng2charts from 'gongng2charts'
 @Component({
   selector: 'lib-gongng2charts-chart',
   templateUrl: './gongng2charts-chart.component.html',
@@ -12,6 +15,18 @@ export class Gongng2chartsChartComponent implements OnInit {
 
   width = 600
   height = 600
+
+
+  /**
+ * the component is refreshed when modification are performed in the back repo 
+ * 
+ * the checkCommitNbTimer polls the commit number of the back repo
+ * if the commit number has increased, it pulls the front repo and redraw the diagram
+ */
+  checkCommitNbTimer: Observable<number> = timer(500, 500);
+  lastCommitNb = -1
+  lastPushFromFrontNb = -1
+  currTime: number = 0
 
   public lineChartData: ChartConfiguration['data'] = {
     datasets: [
@@ -92,10 +107,54 @@ export class Gongng2chartsChartComponent implements OnInit {
   }
 
 
-  constructor() { }
+  constructor(
+    private gongng2chartsCommitNbService: gongng2charts.CommitNbService,
+    private gongng2chartsPushFromFrontNbService: gongng2charts.PushFromFrontNbService,
+  ) { }
 
   ngOnInit(): void {
+
+    this.checkCommitNbTimer.subscribe(
+      currTime => {
+        this.currTime = currTime
+
+        // see above for the explanation
+        this.gongng2chartsCommitNbService.getCommitNb().subscribe(
+          commitNb => {
+            if (this.lastCommitNb < commitNb) {
+
+              console.log("last commit nb " + this.lastCommitNb + " new: " + commitNb)
+              this.refresh()
+              this.lastCommitNb = commitNb
+            }
+          }
+        )
+
+        // see above for the explanation
+        this.gongng2chartsPushFromFrontNbService.getPushFromFrontNb().subscribe(
+          pushFromFrontNb => {
+            if (this.lastPushFromFrontNb < pushFromFrontNb) {
+
+              console.log("last commit nb " + this.lastPushFromFrontNb + " new: " + pushFromFrontNb)
+              this.refresh()
+              this.lastPushFromFrontNb = pushFromFrontNb
+            }
+          }
+        )
+      }
+    )
   }
 
-
+  refresh(): void {
+    // // get the singloton
+    // this.gongmarkdownMarkdownContentService.getMarkdownContents().subscribe(
+    //   markdownContentDBs => {
+    //     if (markdownContentDBs.length == 1) {
+    //       this.markdownContentDB = markdownContentDBs[0]
+    //     } else {
+    //       console.log("wrong number of markdown content " + markdownContentDBs.length)
+    //     }
+    //   }
+    // )
+  }
 }
