@@ -29,4 +29,35 @@
 					}
 				}
 			}
+		},
+		"gongng2chartsspecific": {
+			"projectType": "library",
+			"root": "projects/gongng2chartsspecific",
+			"sourceRoot": "projects/gongng2chartsspecific/src",
+			"prefix": "lib",
+			"architect": {
+				"build": {
+					"builder": "@angular-devkit/build-angular:ng-packagr",
+					"options": {
+						"project": "projects/gongng2chartsspecific/ng-package.json"
+					},
+					"configurations": {
+						"production": {
+							"tsConfig": "projects/gongng2chartsspecific/tsconfig.lib.prod.json"
+						},
+						"development": {
+							"tsConfig": "projects/gongng2chartsspecific/tsconfig.lib.json"
+						}
+					},
+					"defaultConfiguration": "production"
+				},
+				"test": {
+					"builder": "@angular-devkit/build-angular:karma",
+					"options": {
+						"main": "projects/gongng2chartsspecific/src/test.ts",
+						"tsConfig": "projects/gongng2chartsspecific/tsconfig.spec.json",
+						"karmaConfig": "projects/gongng2chartsspecific/karma.conf.js"
+					}
+				}
+			}
 		}},"version":1}

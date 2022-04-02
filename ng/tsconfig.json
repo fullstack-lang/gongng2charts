@@ -52,6 +52,10 @@
       "@types/jointjs": [
         "./node_modules/@types/jointjs"
       ],
+      "gongng2chartsspecific": [
+        "dist/gongng2chartsspecific/gongng2chartsspecific",
+        "dist/gongng2chartsspecific"
+      ],
       "@angular-material-components/datetime-picker": [
         "./node_modules/@angular-material-components/datetime-picker"
       ],
