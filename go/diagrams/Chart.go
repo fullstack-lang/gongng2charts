@@ -39,11 +39,30 @@ var Chart uml.Classdiagram = uml.Classdiagram{
 			},
 			Fields: []*uml.Field{
 				{
+					Field: models.ChartConfiguration{}.ChartType,
+				},
+				{
 					Field: models.ChartConfiguration{}.Name,
 				},
 			},
 		},
-
+		{
+			Struct: &(models.DataPoint{}),
+			Position: &uml.Position{
+				X: 430.000000,
+				Y: 270.000000,
+			},
+			Width:  240.000000,
+			Heigth: 93.000000,
+			Fields: []*uml.Field{
+				{
+					Field: models.DataPoint{}.Name,
+				},
+				{
+					Field: models.DataPoint{}.Value,
+				},
+			},
+		},
 		{
 			Struct: &(models.Dataset{}),
 			Position: &uml.Position{
@@ -52,8 +71,21 @@ var Chart uml.Classdiagram = uml.Classdiagram{
 			},
 			Width:  240.000000,
 			Heigth: 78.000000,
-
+			Links: []*uml.Link{
+				{
+					Field: models.Dataset{}.DataPoints,
+					Middlevertice: &uml.Vertice{
+						X: 825.000000,
+						Y: 304.000000,
+					},
+					TargetMultiplicity: "*",
+					SourceMultiplicity: "0..1",
+				},
+			},
 			Fields: []*uml.Field{
+				{
+					Field: models.Dataset{}.Label,
+				},
 				{
 					Field: models.Dataset{}.Name,
 				},
@@ -67,6 +99,11 @@ var Chart uml.Classdiagram = uml.Classdiagram{
 			},
 			Width:  240.000000,
 			Heigth: 63.000000,
+			Fields: []*uml.Field{
+				{
+					Field: models.Label{}.Name,
+				},
+			},
 		},
 	},
 }
