@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router'
 
 import { ChartConfiguration, ChartEvent, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
@@ -12,6 +13,9 @@ import * as gongng2charts from 'gongng2charts'
   styleUrls: ['./gongng2charts-chart.component.css']
 })
 export class Gongng2chartsChartComponent implements OnInit {
+
+  // name of the chart
+  @Input() chartName: string = ""
 
   width = 600
   height = 600
@@ -77,7 +81,12 @@ export class Gongng2chartsChartComponent implements OnInit {
     private gongng2chartsCommitNbService: gongng2charts.CommitNbService,
     private gongng2chartsPushFromFrontNbService: gongng2charts.PushFromFrontNbService,
     private frontRepoService: gongng2charts.FrontRepoService,
-  ) { }
+    private router: Router,
+  ) {
+
+    // important to distinguish between different chartName
+    this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+  }
 
   ngOnInit(): void {
 
@@ -120,10 +129,19 @@ export class Gongng2chartsChartComponent implements OnInit {
     this.frontRepoService.pull().subscribe(
       frontRepo => {
         this.frontRepo = frontRepo
-        console.log("front repo ClassdiagramPull returned")
+        console.log("front repo returned for map " + this.chartName)
 
-        if (this.frontRepo.ChartConfigurations_array.length == 1) {
-          this.chartConfig = this.frontRepo.ChartConfigurations_array[0]
+        let matchFound: boolean = false
+        for (let chartConfigIdx = 0; chartConfigIdx < this.frontRepo.ChartConfigurations_array.length; chartConfigIdx++) {
+
+          if (this.frontRepo.ChartConfigurations_array[chartConfigIdx].Name == this.chartName) {
+            this.chartConfig = this.frontRepo.ChartConfigurations_array[chartConfigIdx]
+            matchFound = true
+          }
+        }
+
+        if (!matchFound) {
+          return
         }
 
         // reset
@@ -164,7 +182,7 @@ export class Gongng2chartsChartComponent implements OnInit {
 
         // set chart type
         this.lineChartType = this.chartConfig.ChartType as ChartType
-        this.lineChartType = 'line'
+        // this.lineChartType = 'line'
 
         console.log("finished rendering")
         this.chart?.update();

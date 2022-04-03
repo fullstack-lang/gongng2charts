@@ -8,7 +8,8 @@
         </mat-radio-group>
     </as-split-area>
     <as-split-area [size]=95>
-        <app-gongng2charts-splitter></app-gongng2charts-splitter>
+        <app-gongng2charts-splitter>
+        </app-gongng2charts-splitter>
     </as-split-area>
 </as-split>
 
@@ -26,7 +27,7 @@
     </as-split-area>
 </as-split>
 
-<as-split *ngIf="view==chart" direction="vertical">
+<as-split *ngIf="view==chart1" direction="vertical">
     <as-split-area [size]=05>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <mat-radio-group aria-label="Select an option" [(ngModel)]="view">
@@ -36,9 +37,26 @@
         </mat-radio-group>
     </as-split-area>
     <as-split-area [size]=95>
-        <lib-gongng2charts-chart></lib-gongng2charts-chart>
+        <lib-gongng2charts-chart chartName="Chart 1">
+        </lib-gongng2charts-chart>
     </as-split-area>
 </as-split>
+
+<as-split *ngIf="view==chart2" direction="vertical">
+    <as-split-area [size]=05>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <mat-radio-group aria-label="Select an option" [(ngModel)]="view">
+            <mat-radio-button *ngFor="let view of views" [value]="view">
+                {{view}}&nbsp;&nbsp;&nbsp;
+            </mat-radio-button>
+        </mat-radio-group>
+    </as-split-area>
+    <as-split-area [size]=95>
+        <lib-gongng2charts-chart chartName="Chart 2">
+        </lib-gongng2charts-chart>
+    </as-split-area>
+</as-split>
+
 
 
 <as-split *ngIf="view==diagrams" direction="vertical">

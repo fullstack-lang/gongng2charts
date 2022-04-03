@@ -7,10 +7,11 @@ import { Component } from '@angular/core';
 export class AppComponent {
 
   // choices for the top radio button
-  view = 'Chart view'
+  view = 'Chart 1 view'
   default = 'Default view'
   diagrams = 'Diagrams view'
   meta = 'Meta view'
-  chart = "Chart view"
-  views: string[] = [this.chart, this.default, this.diagrams, this.meta];
+  chart1 = "Chart 1 view"
+  chart2 = "Chart 2 view"
+  views: string[] = [this.chart1, this.chart2, this.default, this.diagrams, this.meta];
 }
