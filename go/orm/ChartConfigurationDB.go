@@ -63,6 +63,12 @@ type ChartConfigurationDB struct {
 
 	// Declation for basic field chartconfigurationDB.ChartType {{BasicKind}} (to be completed)
 	ChartType_Data sql.NullString
+
+	// Declation for basic field chartconfigurationDB.Width {{BasicKind}} (to be completed)
+	Width_Data sql.NullInt64
+
+	// Declation for basic field chartconfigurationDB.Heigth {{BasicKind}} (to be completed)
+	Heigth_Data sql.NullInt64
 	// encoding of pointers
 	ChartConfigurationPointersEnconding
 }
@@ -87,6 +93,10 @@ type ChartConfigurationWOP struct {
 	Name string `xlsx:"1"`
 
 	ChartType models.ChartType `xlsx:"2"`
+
+	Width int `xlsx:"3"`
+
+	Heigth int `xlsx:"4"`
 	// insertion for WOP pointer fields
 }
 
@@ -95,6 +105,8 @@ var ChartConfiguration_Fields = []string{
 	"ID",
 	"Name",
 	"ChartType",
+	"Width",
+	"Heigth",
 }
 
 type BackRepoChartConfigurationStruct struct {
@@ -473,6 +485,12 @@ func (chartconfigurationDB *ChartConfigurationDB) CopyBasicFieldsFromChartConfig
 
 	chartconfigurationDB.ChartType_Data.String = chartconfiguration.ChartType.ToString()
 	chartconfigurationDB.ChartType_Data.Valid = true
+
+	chartconfigurationDB.Width_Data.Int64 = int64(chartconfiguration.Width)
+	chartconfigurationDB.Width_Data.Valid = true
+
+	chartconfigurationDB.Heigth_Data.Int64 = int64(chartconfiguration.Heigth)
+	chartconfigurationDB.Heigth_Data.Valid = true
 }
 
 // CopyBasicFieldsFromChartConfigurationWOP
@@ -484,6 +502,12 @@ func (chartconfigurationDB *ChartConfigurationDB) CopyBasicFieldsFromChartConfig
 
 	chartconfigurationDB.ChartType_Data.String = chartconfiguration.ChartType.ToString()
 	chartconfigurationDB.ChartType_Data.Valid = true
+
+	chartconfigurationDB.Width_Data.Int64 = int64(chartconfiguration.Width)
+	chartconfigurationDB.Width_Data.Valid = true
+
+	chartconfigurationDB.Heigth_Data.Int64 = int64(chartconfiguration.Heigth)
+	chartconfigurationDB.Heigth_Data.Valid = true
 }
 
 // CopyBasicFieldsToChartConfiguration
@@ -491,6 +515,8 @@ func (chartconfigurationDB *ChartConfigurationDB) CopyBasicFieldsToChartConfigur
 	// insertion point for checkout of basic fields (back repo to stage)
 	chartconfiguration.Name = chartconfigurationDB.Name_Data.String
 	chartconfiguration.ChartType.FromString(chartconfigurationDB.ChartType_Data.String)
+	chartconfiguration.Width = int(chartconfigurationDB.Width_Data.Int64)
+	chartconfiguration.Heigth = int(chartconfigurationDB.Heigth_Data.Int64)
 }
 
 // CopyBasicFieldsToChartConfigurationWOP
@@ -499,6 +525,8 @@ func (chartconfigurationDB *ChartConfigurationDB) CopyBasicFieldsToChartConfigur
 	// insertion point for checkout of basic fields (back repo to stage)
 	chartconfiguration.Name = chartconfigurationDB.Name_Data.String
 	chartconfiguration.ChartType.FromString(chartconfigurationDB.ChartType_Data.String)
+	chartconfiguration.Width = int(chartconfigurationDB.Width_Data.Int64)
+	chartconfiguration.Heigth = int(chartconfigurationDB.Heigth_Data.Int64)
 }
 
 // Backup generates a json file from a slice of all ChartConfigurationDB instances in the backrepo
