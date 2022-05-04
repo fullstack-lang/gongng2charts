@@ -75,7 +75,11 @@ export class DataPointsTableComponent implements OnInit {
           return datapointDB.Value;
 
         case 'Dataset_DataPoints':
-          return this.frontRepo.Datasets.get(datapointDB.Dataset_DataPointsDBID.Int64)!.Name;
+          if (this.frontRepo.Datasets.get(datapointDB.Dataset_DataPointsDBID.Int64) != undefined) {
+            return this.frontRepo.Datasets.get(datapointDB.Dataset_DataPointsDBID.Int64)!.Name
+          } else {
+            return ""
+          }
 
         default:
           console.assert(false, "Unknown field")

@@ -75,7 +75,11 @@ export class DatasetsTableComponent implements OnInit {
           return datasetDB.Label;
 
         case 'ChartConfiguration_Datasets':
-          return this.frontRepo.ChartConfigurations.get(datasetDB.ChartConfiguration_DatasetsDBID.Int64)!.Name;
+          if (this.frontRepo.ChartConfigurations.get(datasetDB.ChartConfiguration_DatasetsDBID.Int64) != undefined) {
+            return this.frontRepo.ChartConfigurations.get(datasetDB.ChartConfiguration_DatasetsDBID.Int64)!.Name
+          } else {
+            return ""
+          }
 
         default:
           console.assert(false, "Unknown field")

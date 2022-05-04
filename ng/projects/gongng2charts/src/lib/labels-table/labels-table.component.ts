@@ -72,7 +72,11 @@ export class LabelsTableComponent implements OnInit {
           return labelDB.Name;
 
         case 'ChartConfiguration_Labels':
-          return this.frontRepo.ChartConfigurations.get(labelDB.ChartConfiguration_LabelsDBID.Int64)!.Name;
+          if (this.frontRepo.ChartConfigurations.get(labelDB.ChartConfiguration_LabelsDBID.Int64) != undefined) {
+            return this.frontRepo.ChartConfigurations.get(labelDB.ChartConfiguration_LabelsDBID.Int64)!.Name
+          } else {
+            return ""
+          }
 
         default:
           console.assert(false, "Unknown field")
