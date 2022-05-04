@@ -18,6 +18,8 @@ func GenerateChart() {
 func GenerateChart1() {
 
 	chartConfig := (&gongng2charts_models.ChartConfiguration{Name: "Chart 1"}).Stage()
+	chartConfig.Width = 600
+	chartConfig.Heigth = 600
 	chartConfig.ChartType = gongng2charts_models.LINE
 
 	for idx_dataset := 0; idx_dataset < NbDatasets; idx_dataset = idx_dataset + 1 {
@@ -42,6 +44,8 @@ func GenerateChart1() {
 func GenerateChart2() {
 
 	chartConfig := (&gongng2charts_models.ChartConfiguration{Name: "Chart 2"}).Stage()
+	chartConfig.Width = 600
+	chartConfig.Heigth = 600
 	chartConfig.ChartType = gongng2charts_models.BAR
 
 	for idx_dataset := 0; idx_dataset < NbDatasets; idx_dataset = idx_dataset + 1 {

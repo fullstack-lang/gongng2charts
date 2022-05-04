@@ -254,7 +254,7 @@ func (chartconfiguration *ChartConfiguration) GetName() (res string) {
 
 func (chartconfiguration *ChartConfiguration) GetFields() (res []string) {
 	// list of fields 
-	res = []string{"Name", "Datasets", "Labels", "ChartType",  }
+	res = []string{"Name", "Datasets", "Labels", "ChartType", "Width", "Heigth",  }
 	return
 }
 
@@ -279,6 +279,10 @@ func (chartconfiguration *ChartConfiguration) GetFieldStringValue(fieldName stri
 		}
 	case "ChartType":
 		res = chartconfiguration.ChartType.ToCodeString()
+	case "Width":
+		res = fmt.Sprintf("%d", chartconfiguration.Width)
+	case "Heigth":
+		res = fmt.Sprintf("%d", chartconfiguration.Heigth)
 	}
 	return
 }
@@ -816,6 +820,18 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 			setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", "models."+chartconfiguration.ChartType.ToCodeString())
 			initializerStatements += setValueField
 		}
+
+		setValueField = NumberInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Width")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%d", chartconfiguration.Width))
+		initializerStatements += setValueField
+
+		setValueField = NumberInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Heigth")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%d", chartconfiguration.Heigth))
+		initializerStatements += setValueField
 
 	}
 

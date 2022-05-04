@@ -182,7 +182,10 @@ export class Gongng2chartsChartComponent implements OnInit {
 
         // set chart type
         this.lineChartType = this.chartConfig.ChartType as ChartType
-        // this.lineChartType = 'line'
+
+        // set width & height
+        this.width = this.chartConfig.Width
+        this.height = this.chartConfig.Heigth
 
         console.log("finished rendering")
         this.chart?.update();

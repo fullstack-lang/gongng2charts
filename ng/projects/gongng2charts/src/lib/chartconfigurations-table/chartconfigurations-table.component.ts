@@ -74,6 +74,12 @@ export class ChartConfigurationsTableComponent implements OnInit {
         case 'ChartType':
           return chartconfigurationDB.ChartType;
 
+        case 'Width':
+          return chartconfigurationDB.Width;
+
+        case 'Heigth':
+          return chartconfigurationDB.Heigth;
+
         default:
           console.assert(false, "Unknown field")
           return "";
@@ -90,6 +96,8 @@ export class ChartConfigurationsTableComponent implements OnInit {
       // insertion point for merging of fields
       mergedContent += chartconfigurationDB.Name.toLowerCase()
       mergedContent += chartconfigurationDB.ChartType.toLowerCase()
+      mergedContent += chartconfigurationDB.Width.toString()
+      mergedContent += chartconfigurationDB.Heigth.toString()
 
       let isSelected = mergedContent.includes(filter.toLowerCase())
       return isSelected
@@ -142,11 +150,15 @@ export class ChartConfigurationsTableComponent implements OnInit {
       this.displayedColumns = ['ID', 'Edit', 'Delete', // insertion point for columns to display
         "Name",
         "ChartType",
+        "Width",
+        "Heigth",
       ]
     } else {
       this.displayedColumns = ['select', 'ID', // insertion point for columns to display
         "Name",
         "ChartType",
+        "Width",
+        "Heigth",
       ]
       this.selection = new SelectionModel<ChartConfigurationDB>(allowMultiSelect, this.initialSelection);
     }

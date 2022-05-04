@@ -57,6 +57,18 @@
         </mat-select>
     </mat-form-field>
 
+    <!-- -->
+    <mat-form-field class="detail-full-width">
+        <mat-label>Width</mat-label>
+        <input type="number" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="chartconfiguration.Width" [ngModelOptions]="{standalone: true}">
+    </mat-form-field>
+
+    <!-- -->
+    <mat-form-field class="detail-full-width">
+        <mat-label>Heigth</mat-label>
+        <input type="number" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="chartconfiguration.Heigth" [ngModelOptions]="{standalone: true}">
+    </mat-form-field>
+
     <div class="details__save">
         <button mat-raised-button color="primary" (click)="save()">
             Save chartconfiguration
