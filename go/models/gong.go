@@ -253,8 +253,8 @@ func (chartconfiguration *ChartConfiguration) GetName() (res string) {
 }
 
 func (chartconfiguration *ChartConfiguration) GetFields() (res []string) {
-	// list of fields 
-	res = []string{"Name", "Datasets", "Labels", "ChartType", "Width", "Heigth",  }
+	// list of fields
+	res = []string{"Name", "Datasets", "Labels", "ChartType", "Width", "Heigth"}
 	return
 }
 
@@ -395,8 +395,8 @@ func (datapoint *DataPoint) GetName() (res string) {
 }
 
 func (datapoint *DataPoint) GetFields() (res []string) {
-	// list of fields 
-	res = []string{"Name", "Value",  }
+	// list of fields
+	res = []string{"Name", "Value"}
 	return
 }
 
@@ -519,8 +519,8 @@ func (dataset *Dataset) GetName() (res string) {
 }
 
 func (dataset *Dataset) GetFields() (res []string) {
-	// list of fields 
-	res = []string{"Name", "DataPoints", "Label",  }
+	// list of fields
+	res = []string{"Name", "DataPoints", "Label"}
 	return
 }
 
@@ -650,8 +650,8 @@ func (label *Label) GetName() (res string) {
 }
 
 func (label *Label) GetFields() (res []string) {
-	// list of fields 
-	res = []string{"Name",  }
+	// list of fields
+	res = []string{"Name"}
 	return
 }
 
@@ -1030,6 +1030,48 @@ func generatesIdentifier(gongStructName string, idx int, instanceName string) (i
 
 	return
 }
+
+// insertion point of functions that provide maps for reverse associations
+// generate function for reverse association maps of ChartConfiguration
+func (stageStruct *StageStruct) CreateReverseMap_ChartConfiguration_Datasets() (res map[*Dataset]*ChartConfiguration) {
+	res = make(map[*Dataset]*ChartConfiguration)
+
+	for chartconfiguration := range stageStruct.ChartConfigurations {
+		for _, dataset_ := range chartconfiguration.Datasets {
+			res[dataset_] = chartconfiguration
+		}
+	}
+
+	return
+}
+
+func (stageStruct *StageStruct) CreateReverseMap_ChartConfiguration_Labels() (res map[*Label]*ChartConfiguration) {
+	res = make(map[*Label]*ChartConfiguration)
+
+	for chartconfiguration := range stageStruct.ChartConfigurations {
+		for _, label_ := range chartconfiguration.Labels {
+			res[label_] = chartconfiguration
+		}
+	}
+
+	return
+}
+
+// generate function for reverse association maps of DataPoint
+// generate function for reverse association maps of Dataset
+func (stageStruct *StageStruct) CreateReverseMap_Dataset_DataPoints() (res map[*DataPoint]*Dataset) {
+	res = make(map[*DataPoint]*Dataset)
+
+	for dataset := range stageStruct.Datasets {
+		for _, datapoint_ := range dataset.DataPoints {
+			res[datapoint_] = dataset
+		}
+	}
+
+	return
+}
+
+// generate function for reverse association maps of Label
 
 // insertion point of enum utility functions
 // Utility function for ChartType
