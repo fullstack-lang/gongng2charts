@@ -1,6 +1,6 @@
 module github.com/fullstack-lang/gongng2charts
 
-go 1.17
+go 1.18
 
 require (
 	github.com/fullstack-lang/gong v0.0.0-20220401164101-3926f4efbce8

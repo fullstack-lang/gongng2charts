@@ -12,7 +12,7 @@ import (
 )
 
 // swagger:ignore
-type __void struct{}
+type __void any
 
 // needed for creating set of instances in the stage
 var __member __void
@@ -28,16 +28,16 @@ type GongStructInterface interface {
 // StageStruct enables storage of staged instances
 // swagger:ignore
 type StageStruct struct { // insertion point for definition of arrays registering instances
-	ChartConfigurations           map[*ChartConfiguration]struct{}
+	ChartConfigurations           map[*ChartConfiguration]any
 	ChartConfigurations_mapString map[string]*ChartConfiguration
 
-	DataPoints           map[*DataPoint]struct{}
+	DataPoints           map[*DataPoint]any
 	DataPoints_mapString map[string]*DataPoint
 
-	Datasets           map[*Dataset]struct{}
+	Datasets           map[*Dataset]any
 	Datasets_mapString map[string]*Dataset
 
-	Labels           map[*Label]struct{}
+	Labels           map[*Label]any
 	Labels_mapString map[string]*Label
 
 	AllModelsStructCreateCallback AllModelsStructCreateInterface
@@ -81,16 +81,16 @@ type BackRepoInterface interface {
 
 // swagger:ignore instructs the gong compiler (gongc) to avoid this particular struct
 var Stage StageStruct = StageStruct{ // insertion point for array initiatialisation
-	ChartConfigurations:           make(map[*ChartConfiguration]struct{}),
+	ChartConfigurations:           make(map[*ChartConfiguration]any),
 	ChartConfigurations_mapString: make(map[string]*ChartConfiguration),
 
-	DataPoints:           make(map[*DataPoint]struct{}),
+	DataPoints:           make(map[*DataPoint]any),
 	DataPoints_mapString: make(map[string]*DataPoint),
 
-	Datasets:           make(map[*Dataset]struct{}),
+	Datasets:           make(map[*Dataset]any),
 	Datasets_mapString: make(map[string]*Dataset),
 
-	Labels:           make(map[*Label]struct{}),
+	Labels:           make(map[*Label]any),
 	Labels_mapString: make(map[string]*Label),
 
 	// end of insertion point
@@ -680,16 +680,16 @@ type AllModelsStructDeleteInterface interface { // insertion point for Callbacks
 }
 
 func (stage *StageStruct) Reset() { // insertion point for array reset
-	stage.ChartConfigurations = make(map[*ChartConfiguration]struct{})
+	stage.ChartConfigurations = make(map[*ChartConfiguration]any)
 	stage.ChartConfigurations_mapString = make(map[string]*ChartConfiguration)
 
-	stage.DataPoints = make(map[*DataPoint]struct{})
+	stage.DataPoints = make(map[*DataPoint]any)
 	stage.DataPoints_mapString = make(map[string]*DataPoint)
 
-	stage.Datasets = make(map[*Dataset]struct{})
+	stage.Datasets = make(map[*Dataset]any)
 	stage.Datasets_mapString = make(map[string]*Dataset)
 
-	stage.Labels = make(map[*Label]struct{})
+	stage.Labels = make(map[*Label]any)
 	stage.Labels_mapString = make(map[string]*Label)
 
 }
@@ -1032,6 +1032,7 @@ func generatesIdentifier(gongStructName string, idx int, instanceName string) (i
 }
 
 // insertion point of functions that provide maps for reverse associations
+
 // generate function for reverse association maps of ChartConfiguration
 func (stageStruct *StageStruct) CreateReverseMap_ChartConfiguration_Datasets() (res map[*Dataset]*ChartConfiguration) {
 	res = make(map[*Dataset]*ChartConfiguration)
@@ -1057,7 +1058,9 @@ func (stageStruct *StageStruct) CreateReverseMap_ChartConfiguration_Labels() (re
 	return
 }
 
+
 // generate function for reverse association maps of DataPoint
+
 // generate function for reverse association maps of Dataset
 func (stageStruct *StageStruct) CreateReverseMap_Dataset_DataPoints() (res map[*DataPoint]*Dataset) {
 	res = make(map[*DataPoint]*Dataset)
@@ -1071,7 +1074,68 @@ func (stageStruct *StageStruct) CreateReverseMap_Dataset_DataPoints() (res map[*
 	return
 }
 
+
 // generate function for reverse association maps of Label
+
+type GongstructSet interface {
+	map[any]any |
+		// insertion point for generic types
+		map[*ChartConfiguration]any |
+		map[*DataPoint]any |
+		map[*Dataset]any |
+		map[*Label]any |
+		map[*any]any // because go does not support an extra "|" at the end of type specifications
+}
+
+type GongstructMapString interface {
+	map[any]any |
+		// insertion point for generic types
+		map[string]*ChartConfiguration |
+		map[string]*DataPoint |
+		map[string]*Dataset |
+		map[string]*Label |
+		map[*any]any // because go does not support an extra "|" at the end of type specifications
+}
+
+// GongGetSet returns the set staged GongstructType instances
+// it is usefull because it allows refactoring of gong struct identifier
+func GongGetSet[Type GongstructSet]() *Type {
+	var ret Type
+
+	switch any(ret).(type) {
+	// insertion point for generic get functions
+	case map[*ChartConfiguration]any:
+		return any(&Stage.ChartConfigurations).(*Type)
+	case map[*DataPoint]any:
+		return any(&Stage.DataPoints).(*Type)
+	case map[*Dataset]any:
+		return any(&Stage.Datasets).(*Type)
+	case map[*Label]any:
+		return any(&Stage.Labels).(*Type)
+	default:
+		return nil
+	}
+}
+
+// GongGetMap returns the map of staged GongstructType instances
+// it is usefull because it allows refactoring of gong struct identifier
+func GongGetMap[Type GongstructMapString]() *Type {
+	var ret Type
+
+	switch any(ret).(type) {
+	// insertion point for generic get functions
+	case map[string]*ChartConfiguration:
+		return any(&Stage.ChartConfigurations_mapString).(*Type)
+	case map[string]*DataPoint:
+		return any(&Stage.DataPoints_mapString).(*Type)
+	case map[string]*Dataset:
+		return any(&Stage.Datasets_mapString).(*Type)
+	case map[string]*Label:
+		return any(&Stage.Labels_mapString).(*Type)
+	default:
+		return nil
+	}
+}
 
 // insertion point of enum utility functions
 // Utility function for ChartType

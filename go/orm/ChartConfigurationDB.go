@@ -317,7 +317,7 @@ func (backRepoChartConfiguration *BackRepoChartConfigurationStruct) CheckoutPhas
 
 	// list of instances to be removed
 	// start from the initial map on the stage and remove instances that have been checked out
-	chartconfigurationInstancesToBeRemovedFromTheStage := make(map[*models.ChartConfiguration]struct{})
+	chartconfigurationInstancesToBeRemovedFromTheStage := make(map[*models.ChartConfiguration]any)
 	for key, value := range models.Stage.ChartConfigurations {
 		chartconfigurationInstancesToBeRemovedFromTheStage[key] = value
 	}

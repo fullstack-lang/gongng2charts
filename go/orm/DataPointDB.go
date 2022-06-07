@@ -273,7 +273,7 @@ func (backRepoDataPoint *BackRepoDataPointStruct) CheckoutPhaseOne() (Error erro
 
 	// list of instances to be removed
 	// start from the initial map on the stage and remove instances that have been checked out
-	datapointInstancesToBeRemovedFromTheStage := make(map[*models.DataPoint]struct{})
+	datapointInstancesToBeRemovedFromTheStage := make(map[*models.DataPoint]any)
 	for key, value := range models.Stage.DataPoints {
 		datapointInstancesToBeRemovedFromTheStage[key] = value
 	}

@@ -267,7 +267,7 @@ func (backRepoLabel *BackRepoLabelStruct) CheckoutPhaseOne() (Error error) {
 
 	// list of instances to be removed
 	// start from the initial map on the stage and remove instances that have been checked out
-	labelInstancesToBeRemovedFromTheStage := make(map[*models.Label]struct{})
+	labelInstancesToBeRemovedFromTheStage := make(map[*models.Label]any)
 	for key, value := range models.Stage.Labels {
 		labelInstancesToBeRemovedFromTheStage[key] = value
 	}

@@ -292,7 +292,7 @@ func (backRepoDataset *BackRepoDatasetStruct) CheckoutPhaseOne() (Error error) {
 
 	// list of instances to be removed
 	// start from the initial map on the stage and remove instances that have been checked out
-	datasetInstancesToBeRemovedFromTheStage := make(map[*models.Dataset]struct{})
+	datasetInstancesToBeRemovedFromTheStage := make(map[*models.Dataset]any)
 	for key, value := range models.Stage.Datasets {
 		datasetInstancesToBeRemovedFromTheStage[key] = value
 	}
