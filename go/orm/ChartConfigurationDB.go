@@ -58,16 +58,16 @@ type ChartConfigurationDB struct {
 
 	// insertion for basic fields declaration
 
-	// Declation for basic field chartconfigurationDB.Name {{BasicKind}} (to be completed)
+	// Declation for basic field chartconfigurationDB.Name
 	Name_Data sql.NullString
 
-	// Declation for basic field chartconfigurationDB.ChartType {{BasicKind}} (to be completed)
+	// Declation for basic field chartconfigurationDB.ChartType
 	ChartType_Data sql.NullString
 
-	// Declation for basic field chartconfigurationDB.Width {{BasicKind}} (to be completed)
+	// Declation for basic field chartconfigurationDB.Width
 	Width_Data sql.NullInt64
 
-	// Declation for basic field chartconfigurationDB.Heigth {{BasicKind}} (to be completed)
+	// Declation for basic field chartconfigurationDB.Heigth
 	Heigth_Data sql.NullInt64
 	// encoding of pointers
 	ChartConfigurationPointersEnconding

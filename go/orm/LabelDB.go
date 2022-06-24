@@ -64,7 +64,7 @@ type LabelDB struct {
 
 	// insertion for basic fields declaration
 
-	// Declation for basic field labelDB.Name {{BasicKind}} (to be completed)
+	// Declation for basic field labelDB.Name
 	Name_Data sql.NullString
 	// encoding of pointers
 	LabelPointersEnconding

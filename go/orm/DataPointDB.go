@@ -64,10 +64,10 @@ type DataPointDB struct {
 
 	// insertion for basic fields declaration
 
-	// Declation for basic field datapointDB.Name {{BasicKind}} (to be completed)
+	// Declation for basic field datapointDB.Name
 	Name_Data sql.NullString
 
-	// Declation for basic field datapointDB.Value {{BasicKind}} (to be completed)
+	// Declation for basic field datapointDB.Value
 	Value_Data sql.NullFloat64
 	// encoding of pointers
 	DataPointPointersEnconding

@@ -1339,18 +1339,18 @@ func (charttype ChartType) ToString() (res string) {
 	// migration of former implementation of enum
 	switch charttype {
 	// insertion code per enum code
-	case BAR:
-		res = "bar"
-	case DOUGHNUT:
-		res = "doughnut"
 	case LINE:
 		res = "line"
+	case BAR:
+		res = "bar"
+	case RADAR:
+		res = "radar"
 	case PIE:
 		res = "pie"
 	case POLAR_AREA:
 		res = "polarArea"
-	case RADAR:
-		res = "radar"
+	case DOUGHNUT:
+		res = "doughnut"
 	}
 	return
 }
@@ -1359,18 +1359,18 @@ func (charttype *ChartType) FromString(input string) {
 
 	switch input {
 	// insertion code per enum code
-	case "bar":
-		*charttype = BAR
-	case "doughnut":
-		*charttype = DOUGHNUT
 	case "line":
 		*charttype = LINE
+	case "bar":
+		*charttype = BAR
+	case "radar":
+		*charttype = RADAR
 	case "pie":
 		*charttype = PIE
 	case "polarArea":
 		*charttype = POLAR_AREA
-	case "radar":
-		*charttype = RADAR
+	case "doughnut":
+		*charttype = DOUGHNUT
 	}
 }
 
@@ -1378,18 +1378,18 @@ func (charttype *ChartType) ToCodeString() (res string) {
 
 	switch *charttype {
 	// insertion code per enum code
-	case BAR:
-		res = "BAR"
-	case DOUGHNUT:
-		res = "DOUGHNUT"
 	case LINE:
 		res = "LINE"
+	case BAR:
+		res = "BAR"
+	case RADAR:
+		res = "RADAR"
 	case PIE:
 		res = "PIE"
 	case POLAR_AREA:
 		res = "POLAR_AREA"
-	case RADAR:
-		res = "RADAR"
+	case DOUGHNUT:
+		res = "DOUGHNUT"
 	}
 	return
 }

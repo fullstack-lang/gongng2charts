@@ -64,10 +64,10 @@ type DatasetDB struct {
 
 	// insertion for basic fields declaration
 
-	// Declation for basic field datasetDB.Name {{BasicKind}} (to be completed)
+	// Declation for basic field datasetDB.Name
 	Name_Data sql.NullString
 
-	// Declation for basic field datasetDB.Label {{BasicKind}} (to be completed)
+	// Declation for basic field datasetDB.Label
 	Label_Data sql.NullString
 	// encoding of pointers
 	DatasetPointersEnconding

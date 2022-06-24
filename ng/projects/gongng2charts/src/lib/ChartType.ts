@@ -1,12 +1,12 @@
 // generated from ng_file_enum.ts.go
 export enum ChartType {
 	// insertion point	
-	BAR = "bar",
-	DOUGHNUT = "doughnut",
 	LINE = "line",
+	BAR = "bar",
+	RADAR = "radar",
 	PIE = "pie",
 	POLAR_AREA = "polarArea",
-	RADAR = "radar",
+	DOUGHNUT = "doughnut",
 }
 
 export interface ChartTypeSelect {
@@ -15,10 +15,10 @@ export interface ChartTypeSelect {
 }
 
 export const ChartTypeList: ChartTypeSelect[] = [ // insertion point	
-	{ value: ChartType.BAR, viewValue: "bar" },
-	{ value: ChartType.DOUGHNUT, viewValue: "doughnut" },
 	{ value: ChartType.LINE, viewValue: "line" },
+	{ value: ChartType.BAR, viewValue: "bar" },
+	{ value: ChartType.RADAR, viewValue: "radar" },
 	{ value: ChartType.PIE, viewValue: "pie" },
 	{ value: ChartType.POLAR_AREA, viewValue: "polarArea" },
-	{ value: ChartType.RADAR, viewValue: "radar" },
+	{ value: ChartType.DOUGHNUT, viewValue: "doughnut" },
 ];
