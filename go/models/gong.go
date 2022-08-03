@@ -152,18 +152,6 @@ func (stage *StageStruct) RestoreXL(dirPath string) {
 }
 
 // insertion point for cumulative sub template with model space calls
-func (stage *StageStruct) getChartConfigurationOrderedStructWithNameField() []*ChartConfiguration {
-	// have alphabetical order generation
-	chartconfigurationOrdered := []*ChartConfiguration{}
-	for chartconfiguration := range stage.ChartConfigurations {
-		chartconfigurationOrdered = append(chartconfigurationOrdered, chartconfiguration)
-	}
-	sort.Slice(chartconfigurationOrdered[:], func(i, j int) bool {
-		return chartconfigurationOrdered[i].Name < chartconfigurationOrdered[j].Name
-	})
-	return chartconfigurationOrdered
-}
-
 // Stage puts chartconfiguration to the model stage
 func (chartconfiguration *ChartConfiguration) Stage() *ChartConfiguration {
 	Stage.ChartConfigurations[chartconfiguration] = __member
@@ -257,18 +245,6 @@ func DeleteORMChartConfiguration(chartconfiguration *ChartConfiguration) {
 // for satisfaction of GongStruct interface
 func (chartconfiguration *ChartConfiguration) GetName() (res string) {
 	return chartconfiguration.Name
-}
-
-func (stage *StageStruct) getDataPointOrderedStructWithNameField() []*DataPoint {
-	// have alphabetical order generation
-	datapointOrdered := []*DataPoint{}
-	for datapoint := range stage.DataPoints {
-		datapointOrdered = append(datapointOrdered, datapoint)
-	}
-	sort.Slice(datapointOrdered[:], func(i, j int) bool {
-		return datapointOrdered[i].Name < datapointOrdered[j].Name
-	})
-	return datapointOrdered
 }
 
 // Stage puts datapoint to the model stage
@@ -366,18 +342,6 @@ func (datapoint *DataPoint) GetName() (res string) {
 	return datapoint.Name
 }
 
-func (stage *StageStruct) getDatasetOrderedStructWithNameField() []*Dataset {
-	// have alphabetical order generation
-	datasetOrdered := []*Dataset{}
-	for dataset := range stage.Datasets {
-		datasetOrdered = append(datasetOrdered, dataset)
-	}
-	sort.Slice(datasetOrdered[:], func(i, j int) bool {
-		return datasetOrdered[i].Name < datasetOrdered[j].Name
-	})
-	return datasetOrdered
-}
-
 // Stage puts dataset to the model stage
 func (dataset *Dataset) Stage() *Dataset {
 	Stage.Datasets[dataset] = __member
@@ -471,18 +435,6 @@ func DeleteORMDataset(dataset *Dataset) {
 // for satisfaction of GongStruct interface
 func (dataset *Dataset) GetName() (res string) {
 	return dataset.Name
-}
-
-func (stage *StageStruct) getLabelOrderedStructWithNameField() []*Label {
-	// have alphabetical order generation
-	labelOrdered := []*Label{}
-	for label := range stage.Labels {
-		labelOrdered = append(labelOrdered, label)
-	}
-	sort.Slice(labelOrdered[:], func(i, j int) bool {
-		return labelOrdered[i].Name < labelOrdered[j].Name
-	})
-	return labelOrdered
 }
 
 // Stage puts label to the model stage
@@ -993,13 +945,23 @@ func (stageStruct *StageStruct) CreateReverseMap_Dataset_DataPoints() (res map[*
 
 // generate function for reverse association maps of Label
 
-// Gongstruct is the type paramter for generated generic function that allows
+// Gongstruct is the type parameter for generated generic function that allows
 // - access to staged instances
 // - navigation between staged instances by going backward association links between gongstruct
 // - full refactoring of Gongstruct identifiers / fields
 type Gongstruct interface {
 	// insertion point for generic types
 	ChartConfiguration | DataPoint | Dataset | Label
+}
+
+// Gongstruct is the type parameter for generated generic function that allows
+// - access to staged instances
+// - navigation between staged instances by going backward association links between gongstruct
+// - full refactoring of Gongstruct identifiers / fields
+type PointerToGongstruct interface {
+	// insertion point for generic types
+	*ChartConfiguration | *DataPoint | *Dataset | *Label
+	GetName() string
 }
 
 type GongstructSet interface {
@@ -1401,3 +1363,4 @@ func (charttype *ChartType) ToCodeString() (res string) {
 	return
 }
 
+// Last line of the template
