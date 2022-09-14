@@ -1,11 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterState } from '@angular/router';
 
+import { BehaviorSubject, Subscription } from 'rxjs';
+
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 
 import { FrontRepoService, FrontRepo } from '../front-repo.service'
 import { CommitNbService } from '../commitnb.service'
+import { GongstructSelectionService } from '../gongstruct-selection.service'
 
 // insertion point for per struct import code
 import { GongBasicFieldService } from '../gongbasicfield.service'
@@ -14,6 +17,8 @@ import { GongEnumService } from '../gongenum.service'
 import { getGongEnumUniqueID } from '../front-repo.service'
 import { GongEnumValueService } from '../gongenumvalue.service'
 import { getGongEnumValueUniqueID } from '../front-repo.service'
+import { GongNoteService } from '../gongnote.service'
+import { getGongNoteUniqueID } from '../front-repo.service'
 import { GongStructService } from '../gongstruct.service'
 import { getGongStructUniqueID } from '../front-repo.service'
 import { GongTimeFieldService } from '../gongtimefield.service'
@@ -153,15 +158,23 @@ export class SidebarComponent implements OnInit {
   // "data" tree that is constructed during NgInit and is passed to the mat-tree component
   gongNodeTree = new Array<GongNode>();
 
+  // SelectedStructChanged is the behavior subject that will emit
+  // the selected gong struct whose table has to be displayed in the table outlet
+  SelectedStructChanged: BehaviorSubject<string> = new BehaviorSubject("");
+
+  subscription: Subscription = new Subscription
+
   constructor(
     private router: Router,
     private frontRepoService: FrontRepoService,
     private commitNbService: CommitNbService,
+    private gongstructSelectionService: GongstructSelectionService,
 
     // insertion point for per struct service declaration
     private gongbasicfieldService: GongBasicFieldService,
     private gongenumService: GongEnumService,
     private gongenumvalueService: GongEnumValueService,
+    private gongnoteService: GongNoteService,
     private gongstructService: GongStructService,
     private gongtimefieldService: GongTimeFieldService,
     private modelpkgService: ModelPkgService,
@@ -169,8 +182,27 @@ export class SidebarComponent implements OnInit {
     private sliceofpointertogongstructfieldService: SliceOfPointerToGongStructFieldService,
   ) { }
 
+  ngOnDestroy() {
+    // prevent memory leak when component destroyed
+    this.subscription.unsubscribe();
+  }
+
   ngOnInit(): void {
+
+    this.subscription = this.gongstructSelectionService.gongtructSelected$.subscribe(
+      gongstructName => {
+        // console.log("sidebar gongstruct selected " + gongstructName)
+
+        this.setTableRouterOutlet(gongstructName.toLowerCase() + "s")
+      });
+
     this.refresh()
+
+    this.SelectedStructChanged.subscribe(
+      selectedStruct => {
+        this.setTableRouterOutlet(selectedStruct)
+      }
+    )
 
     // insertion point for per struct observable for refresh trigger
     // observable for changes in structs
@@ -191,6 +223,14 @@ export class SidebarComponent implements OnInit {
     )
     // observable for changes in structs
     this.gongenumvalueService.GongEnumValueServiceChanged.subscribe(
+      message => {
+        if (message == "post" || message == "update" || message == "delete") {
+          this.refresh()
+        }
+      }
+    )
+    // observable for changes in structs
+    this.gongnoteService.GongNoteServiceChanged.subscribe(
       message => {
         if (message == "post" || message == "update" || message == "delete") {
           this.refresh()
@@ -259,7 +299,7 @@ export class SidebarComponent implements OnInit {
 
       // reset the gong node tree
       this.gongNodeTree = new Array<GongNode>();
-      
+
       // insertion point for per struct tree construction
       /**
       * fill up the GongBasicField part of the mat tree
@@ -455,6 +495,50 @@ export class SidebarComponent implements OnInit {
             children: new Array<GongNode>()
           }
           gongenumvalueGongNodeStruct.children!.push(gongenumvalueGongNodeInstance)
+
+          // insertion point for per field code
+        }
+      )
+
+      /**
+      * fill up the GongNote part of the mat tree
+      */
+      let gongnoteGongNodeStruct: GongNode = {
+        name: "GongNote",
+        type: GongNodeType.STRUCT,
+        id: 0,
+        uniqueIdPerStack: 13 * nonInstanceNodeId,
+        structName: "GongNote",
+        associationField: "",
+        associatedStructName: "",
+        children: new Array<GongNode>()
+      }
+      nonInstanceNodeId = nonInstanceNodeId + 1
+      this.gongNodeTree.push(gongnoteGongNodeStruct)
+
+      this.frontRepo.GongNotes_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
+
+      this.frontRepo.GongNotes_array.forEach(
+        gongnoteDB => {
+          let gongnoteGongNodeInstance: GongNode = {
+            name: gongnoteDB.Name,
+            type: GongNodeType.INSTANCE,
+            id: gongnoteDB.ID,
+            uniqueIdPerStack: getGongNoteUniqueID(gongnoteDB.ID),
+            structName: "GongNote",
+            associationField: "",
+            associatedStructName: "",
+            children: new Array<GongNode>()
+          }
+          gongnoteGongNodeStruct.children!.push(gongnoteGongNodeInstance)
 
           // insertion point for per field code
         }

@@ -11,6 +11,7 @@ export * from './lib/sidebar/sidebar.component'
 export * from './lib/front-repo.service'
 export * from './lib/null-int64'
 export * from './lib/commitnb.service'
+export * from './lib/gongstruct-selection.service'
 export * from './lib/push_from_front_nb.service'
 
 
@@ -63,6 +64,13 @@ export * from './lib/links-table/links-table.component'
 export * from './lib/link-db'
 export * from './lib/link.service'
 
+export * from './lib/note-detail/note-detail.component'
+export * from './lib/note-presentation/note-presentation.component'
+export * from './lib/note-sorting/note-sorting.component'
+export * from './lib/notes-table/notes-table.component'
+export * from './lib/note-db'
+export * from './lib/note.service'
+
 export * from './lib/pkgelt-detail/pkgelt-detail.component'
 export * from './lib/pkgelt-presentation/pkgelt-presentation.component'
 export * from './lib/pkgelt-sorting/pkgelt-sorting.component'
@@ -100,6 +108,7 @@ export * from './lib/vertice.service'
 
 
 export * from './lib/ClassshapeTargetType'
+export * from './lib/EditionMode'
 export * from './lib/GongdocCommandType'
 export * from './lib/GongdocNodeType'
 export * from './lib/MultiplicityType'

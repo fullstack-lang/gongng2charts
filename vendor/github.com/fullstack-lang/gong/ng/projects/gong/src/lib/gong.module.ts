@@ -36,6 +36,7 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { SplitterComponent } from './splitter/splitter.component'
 import { SidebarComponent } from './sidebar/sidebar.component';
+import { GongstructSelectionService } from './gongstruct-selection.service'
 
 // insertion point for imports 
 import { GongBasicFieldsTableComponent } from './gongbasicfields-table/gongbasicfields-table.component'
@@ -52,6 +53,11 @@ import { GongEnumValuesTableComponent } from './gongenumvalues-table/gongenumval
 import { GongEnumValueSortingComponent } from './gongenumvalue-sorting/gongenumvalue-sorting.component'
 import { GongEnumValueDetailComponent } from './gongenumvalue-detail/gongenumvalue-detail.component'
 import { GongEnumValuePresentationComponent } from './gongenumvalue-presentation/gongenumvalue-presentation.component'
+
+import { GongNotesTableComponent } from './gongnotes-table/gongnotes-table.component'
+import { GongNoteSortingComponent } from './gongnote-sorting/gongnote-sorting.component'
+import { GongNoteDetailComponent } from './gongnote-detail/gongnote-detail.component'
+import { GongNotePresentationComponent } from './gongnote-presentation/gongnote-presentation.component'
 
 import { GongStructsTableComponent } from './gongstructs-table/gongstructs-table.component'
 import { GongStructSortingComponent } from './gongstruct-sorting/gongstruct-sorting.component'
@@ -96,6 +102,11 @@ import { SliceOfPointerToGongStructFieldPresentationComponent } from './sliceofp
 		GongEnumValueSortingComponent,
 		GongEnumValueDetailComponent,
 		GongEnumValuePresentationComponent,
+
+		GongNotesTableComponent,
+		GongNoteSortingComponent,
+		GongNoteDetailComponent,
+		GongNotePresentationComponent,
 
 		GongStructsTableComponent,
 		GongStructSortingComponent,
@@ -176,6 +187,11 @@ import { SliceOfPointerToGongStructFieldPresentationComponent } from './sliceofp
 		GongEnumValueDetailComponent,
 		GongEnumValuePresentationComponent,
 
+		GongNotesTableComponent,
+		GongNoteSortingComponent,
+		GongNoteDetailComponent,
+		GongNotePresentationComponent,
+
 		GongStructsTableComponent,
 		GongStructSortingComponent,
 		GongStructDetailComponent,
@@ -207,6 +223,7 @@ import { SliceOfPointerToGongStructFieldPresentationComponent } from './sliceofp
 
 	],
 	providers: [
+		GongstructSelectionService,
 		{
 			provide: MatDialogRef,
 			useValue: {}

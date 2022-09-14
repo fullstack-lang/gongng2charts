@@ -126,6 +126,9 @@ export class SidebarGongdocDiagramsComponent implements OnInit {
   // "data" tree that is constructed during NgInit and is passed to the mat-tree component
   gongNodeTree = new Array<GongNode>();
 
+  // the package can be editable or not
+  editable: boolean = false
+
   constructor(
     private router: Router,
     private frontRepoService: gongdoc.FrontRepoService,
@@ -155,7 +158,7 @@ export class SidebarGongdocDiagramsComponent implements OnInit {
 
     // observable for changes in structs
     this.classdiagramService.ClassdiagramServiceChanged.subscribe(
-      (message:string) => {
+      (message: string) => {
         if (message == "post" || message == "update" || message == "delete") {
           this.refresh()
         }
@@ -164,8 +167,13 @@ export class SidebarGongdocDiagramsComponent implements OnInit {
 
   }
   refresh(): void {
-    this.frontRepoService.pull().subscribe( (frontRepo: gongdoc.FrontRepo) => {
+    this.frontRepoService.pull().subscribe((frontRepo: gongdoc.FrontRepo) => {
       this.frontRepo = frontRepo
+
+      this.frontRepo.Pkgelts_array.forEach(
+        pkgElt => {
+          this.editable = pkgElt.Editable
+        })
 
       // use of a Gödel number to uniquely identfy nodes : 2 * node.id + 3 * node.level
       let memoryOfExpandedNodes = new Map<number, boolean>()
@@ -189,7 +197,7 @@ export class SidebarGongdocDiagramsComponent implements OnInit {
       * fill up the Classdiagram part of the mat tree
       */
       let classdiagramGongNodeStruct: GongNode = {
-        name: "Classdiagrams  (impl. as a go variables)",
+        name: "UML class diagrams",
         type: GongNodeType.ROOT_OF_CLASS_DIAGRAMS,
         id: 2 * nodeId++,
         structName: "Classdiagram",
@@ -201,7 +209,7 @@ export class SidebarGongdocDiagramsComponent implements OnInit {
       this.frontRepo.Classdiagrams_array.forEach(
         (classdiagramDB: gongdoc.ClassdiagramDB) => {
           let classdiagramGongNodeInstance: GongNode = {
-            name: "var : " + classdiagramDB.Name,
+            name: classdiagramDB.Name,
             type: GongNodeType.CLASS_DIAGRAM_INSTANCE,
             id: 3 * classdiagramDB.ID,
             structName: "Classdiagram",
@@ -242,7 +250,7 @@ export class SidebarGongdocDiagramsComponent implements OnInit {
       * fill up the Umlsc part of the mat tree
       */
       let umlscGongNodeStruct: GongNode = {
-        name: "Umlscs  (impl. as a go variables)",
+        name: "UML state chart diagrams",
         type: GongNodeType.ROOT_OF_STATE_CHARTS,
         id: 2 * nodeId++,
         structName: "Umlsc",
@@ -254,7 +262,7 @@ export class SidebarGongdocDiagramsComponent implements OnInit {
       this.frontRepo.Umlscs_array.forEach(
         (umlscDB: gongdoc.UmlscDB) => {
           let umlscGongNodeInstance: GongNode = {
-            name: "var : " + umlscDB.Name,
+            name: umlscDB.Name,
             type: GongNodeType.STATE_CHART_INSTANCE,
             id: 7 * umlscDB.ID,
             structName: "Umlsc",
@@ -321,13 +329,18 @@ export class SidebarGongdocDiagramsComponent implements OnInit {
 
   setEditorRouterOutlet(path: string) {
 
-    console.log("setEditorRouterOutlet " + path)
+    console.log("sidebar gongdoc setEditorRouterOutlet " + path)
+    console.log("to lower case ", path.toLowerCase())
 
     this.router.navigate([{
       outlets: {
         elementeditor: ["github_com_fullstack_lang_gongdoc_go-" + path.toLowerCase()]
       }
-    }]);
+    }]).catch(
+      reason => {
+        console.log(reason)
+      }
+    );
   }
 
   // set editor outlet
@@ -338,7 +351,7 @@ export class SidebarGongdocDiagramsComponent implements OnInit {
     if (node.type == GongNodeType.CLASS_DIAGRAM_INSTANCE) {
       this.router.navigate([{
         outlets: {
-          diagrameditor: ["classdiagram-detail", node.bdId]
+          diagrameditor: ["classdiagram-detail", node.bdId, { editable: this.editable }]
         }
       }]).catch(
         reason => {

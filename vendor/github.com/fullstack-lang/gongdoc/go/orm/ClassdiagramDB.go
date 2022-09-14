@@ -64,8 +64,12 @@ type ClassdiagramDB struct {
 
 	// insertion for basic fields declaration
 
-	// Declation for basic field classdiagramDB.Name {{BasicKind}} (to be completed)
+	// Declation for basic field classdiagramDB.Name
 	Name_Data sql.NullString
+
+	// Declation for basic field classdiagramDB.IsEditable
+	// provide the sql storage for the boolan
+	IsEditable_Data sql.NullBool
 	// encoding of pointers
 	ClassdiagramPointersEnconding
 }
@@ -88,6 +92,8 @@ type ClassdiagramWOP struct {
 	// insertion for WOP basic fields
 
 	Name string `xlsx:"1"`
+
+	IsEditable bool `xlsx:"2"`
 	// insertion for WOP pointer fields
 }
 
@@ -95,6 +101,7 @@ var Classdiagram_Fields = []string{
 	// insertion for WOP basic fields
 	"ID",
 	"Name",
+	"IsEditable",
 }
 
 type BackRepoClassdiagramStruct struct {
@@ -257,6 +264,25 @@ func (backRepoClassdiagram *BackRepoClassdiagramStruct) CommitPhaseTwoInstance(b
 			}
 		}
 
+		// This loop encodes the slice of pointers classdiagram.Notes into the back repo.
+		// Each back repo instance at the end of the association encode the ID of the association start
+		// into a dedicated field for coding the association. The back repo instance is then saved to the db
+		for idx, noteAssocEnd := range classdiagram.Notes {
+
+			// get the back repo instance at the association end
+			noteAssocEnd_DB :=
+				backRepo.BackRepoNote.GetNoteDBFromNotePtr(noteAssocEnd)
+
+			// encode reverse pointer in the association end back repo instance
+			noteAssocEnd_DB.Classdiagram_NotesDBID.Int64 = int64(classdiagramDB.ID)
+			noteAssocEnd_DB.Classdiagram_NotesDBID.Valid = true
+			noteAssocEnd_DB.Classdiagram_NotesDBID_Index.Int64 = int64(idx)
+			noteAssocEnd_DB.Classdiagram_NotesDBID_Index.Valid = true
+			if q := backRepoClassdiagram.db.Save(noteAssocEnd_DB); q.Error != nil {
+				return q.Error
+			}
+		}
+
 		query := backRepoClassdiagram.db.Save(&classdiagramDB)
 		if query.Error != nil {
 			return query.Error
@@ -286,7 +312,7 @@ func (backRepoClassdiagram *BackRepoClassdiagramStruct) CheckoutPhaseOne() (Erro
 
 	// list of instances to be removed
 	// start from the initial map on the stage and remove instances that have been checked out
-	classdiagramInstancesToBeRemovedFromTheStage := make(map[*models.Classdiagram]struct{})
+	classdiagramInstancesToBeRemovedFromTheStage := make(map[*models.Classdiagram]any)
 	for key, value := range models.Stage.Classdiagrams {
 		classdiagramInstancesToBeRemovedFromTheStage[key] = value
 	}
@@ -389,6 +415,33 @@ func (backRepoClassdiagram *BackRepoClassdiagramStruct) CheckoutPhaseTwoInstance
 		return classshapeDB_i.Classdiagram_ClassshapesDBID_Index.Int64 < classshapeDB_j.Classdiagram_ClassshapesDBID_Index.Int64
 	})
 
+	// This loop redeem classdiagram.Notes in the stage from the encode in the back repo
+	// It parses all NoteDB in the back repo and if the reverse pointer encoding matches the back repo ID
+	// it appends the stage instance
+	// 1. reset the slice
+	classdiagram.Notes = classdiagram.Notes[:0]
+	// 2. loop all instances in the type in the association end
+	for _, noteDB_AssocEnd := range *backRepo.BackRepoNote.Map_NoteDBID_NoteDB {
+		// 3. Does the ID encoding at the end and the ID at the start matches ?
+		if noteDB_AssocEnd.Classdiagram_NotesDBID.Int64 == int64(classdiagramDB.ID) {
+			// 4. fetch the associated instance in the stage
+			note_AssocEnd := (*backRepo.BackRepoNote.Map_NoteDBID_NotePtr)[noteDB_AssocEnd.ID]
+			// 5. append it the association slice
+			classdiagram.Notes = append(classdiagram.Notes, note_AssocEnd)
+		}
+	}
+
+	// sort the array according to the order
+	sort.Slice(classdiagram.Notes, func(i, j int) bool {
+		noteDB_i_ID := (*backRepo.BackRepoNote.Map_NotePtr_NoteDBID)[classdiagram.Notes[i]]
+		noteDB_j_ID := (*backRepo.BackRepoNote.Map_NotePtr_NoteDBID)[classdiagram.Notes[j]]
+
+		noteDB_i := (*backRepo.BackRepoNote.Map_NoteDBID_NoteDB)[noteDB_i_ID]
+		noteDB_j := (*backRepo.BackRepoNote.Map_NoteDBID_NoteDB)[noteDB_j_ID]
+
+		return noteDB_i.Classdiagram_NotesDBID_Index.Int64 < noteDB_j.Classdiagram_NotesDBID_Index.Int64
+	})
+
 	return
 }
 
@@ -424,6 +477,9 @@ func (classdiagramDB *ClassdiagramDB) CopyBasicFieldsFromClassdiagram(classdiagr
 
 	classdiagramDB.Name_Data.String = classdiagram.Name
 	classdiagramDB.Name_Data.Valid = true
+
+	classdiagramDB.IsEditable_Data.Bool = classdiagram.IsEditable
+	classdiagramDB.IsEditable_Data.Valid = true
 }
 
 // CopyBasicFieldsFromClassdiagramWOP
@@ -432,12 +488,16 @@ func (classdiagramDB *ClassdiagramDB) CopyBasicFieldsFromClassdiagramWOP(classdi
 
 	classdiagramDB.Name_Data.String = classdiagram.Name
 	classdiagramDB.Name_Data.Valid = true
+
+	classdiagramDB.IsEditable_Data.Bool = classdiagram.IsEditable
+	classdiagramDB.IsEditable_Data.Valid = true
 }
 
 // CopyBasicFieldsToClassdiagram
 func (classdiagramDB *ClassdiagramDB) CopyBasicFieldsToClassdiagram(classdiagram *models.Classdiagram) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	classdiagram.Name = classdiagramDB.Name_Data.String
+	classdiagram.IsEditable = classdiagramDB.IsEditable_Data.Bool
 }
 
 // CopyBasicFieldsToClassdiagramWOP
@@ -445,6 +505,7 @@ func (classdiagramDB *ClassdiagramDB) CopyBasicFieldsToClassdiagramWOP(classdiag
 	classdiagram.ID = int(classdiagramDB.ID)
 	// insertion point for checkout of basic fields (back repo to stage)
 	classdiagram.Name = classdiagramDB.Name_Data.String
+	classdiagram.IsEditable = classdiagramDB.IsEditable_Data.Bool
 }
 
 // Backup generates a json file from a slice of all ClassdiagramDB instances in the backrepo

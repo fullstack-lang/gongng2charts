@@ -4,6 +4,7 @@ import (
 	"embed"
 	"flag"
 	"fmt"
+	"go/token"
 	"io/fs"
 	"log"
 	"net/http"
@@ -148,10 +149,15 @@ func main() {
 	dbDB.SetMaxOpenConns(1)
 
 	if *diagrams {
-		// load package to analyse
+
+		// Analyse package
 		modelPkg := &gong_models.ModelPkg{}
 
-		gong_models.Walk("../../models", modelPkg)
+		// since the source is embedded, one needs to
+		// compute the Abstract syntax tree in a special manner
+		pkgs := gong_models.ParseEmbedModel(gongng2charts.GoDir, "go/models")
+
+		gong_models.WalkParser(pkgs, modelPkg)
 		modelPkg.SerializeToStage()
 		gong_models.Stage.Commit()
 
@@ -173,7 +179,14 @@ func main() {
 
 		// classdiagram can only be fully in memory when they are Unmarshalled
 		// for instance, the Name of diagrams or the Name of the Link
-		pkgelt.Unmarshall(modelPkg.PkgPath, "../../diagrams")
+		fset := new(token.FileSet)
+		pkgsParser := gong_models.ParseEmbedModel(gongng2charts.GoDir, "go/diagrams")
+		if len(pkgsParser) != 1 {
+			log.Panic("Unable to parser, wrong number of parsers ", len(pkgsParser))
+		}
+		if pkgParser, ok := pkgsParser["diagrams"]; ok {
+			pkgelt.Unmarshall(modelPkg, pkgParser, fset, "go/diagrams")
+		}
 		pkgelt.SerializeToStage()
 	}
 

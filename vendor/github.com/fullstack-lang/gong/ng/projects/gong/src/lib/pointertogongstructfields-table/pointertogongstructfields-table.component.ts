@@ -77,8 +77,15 @@ export class PointerToGongStructFieldsTableComponent implements OnInit {
         case 'Index':
           return pointertogongstructfieldDB.Index;
 
+        case 'CompositeStructName':
+          return pointertogongstructfieldDB.CompositeStructName;
+
         case 'GongStruct_PointerToGongStructFields':
-          return this.frontRepo.GongStructs.get(pointertogongstructfieldDB.GongStruct_PointerToGongStructFieldsDBID.Int64)!.Name;
+          if (this.frontRepo.GongStructs.get(pointertogongstructfieldDB.GongStruct_PointerToGongStructFieldsDBID.Int64) != undefined) {
+            return this.frontRepo.GongStructs.get(pointertogongstructfieldDB.GongStruct_PointerToGongStructFieldsDBID.Int64)!.Name
+          } else {
+            return ""
+          }
 
         default:
           console.assert(false, "Unknown field")
@@ -99,6 +106,7 @@ export class PointerToGongStructFieldsTableComponent implements OnInit {
         mergedContent += pointertogongstructfieldDB.GongStruct.Name.toLowerCase()
       }
       mergedContent += pointertogongstructfieldDB.Index.toString()
+      mergedContent += pointertogongstructfieldDB.CompositeStructName.toLowerCase()
       if (pointertogongstructfieldDB.GongStruct_PointerToGongStructFieldsDBID.Int64 != 0) {
         mergedContent += this.frontRepo.GongStructs.get(pointertogongstructfieldDB.GongStruct_PointerToGongStructFieldsDBID.Int64)!.Name.toLowerCase()
       }
@@ -156,6 +164,7 @@ export class PointerToGongStructFieldsTableComponent implements OnInit {
         "Name",
         "GongStruct",
         "Index",
+        "CompositeStructName",
         "GongStruct_PointerToGongStructFields",
       ]
     } else {
@@ -163,6 +172,7 @@ export class PointerToGongStructFieldsTableComponent implements OnInit {
         "Name",
         "GongStruct",
         "Index",
+        "CompositeStructName",
         "GongStruct_PointerToGongStructFields",
       ]
       this.selection = new SelectionModel<PointerToGongStructFieldDB>(allowMultiSelect, this.initialSelection);

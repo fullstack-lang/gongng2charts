@@ -36,6 +36,7 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { SplitterComponent } from './splitter/splitter.component'
 import { SidebarComponent } from './sidebar/sidebar.component';
+import { GongstructSelectionService } from './gongstruct-selection.service'
 
 // insertion point for imports 
 import { ClassdiagramsTableComponent } from './classdiagrams-table/classdiagrams-table.component'
@@ -72,6 +73,11 @@ import { LinksTableComponent } from './links-table/links-table.component'
 import { LinkSortingComponent } from './link-sorting/link-sorting.component'
 import { LinkDetailComponent } from './link-detail/link-detail.component'
 import { LinkPresentationComponent } from './link-presentation/link-presentation.component'
+
+import { NotesTableComponent } from './notes-table/notes-table.component'
+import { NoteSortingComponent } from './note-sorting/note-sorting.component'
+import { NoteDetailComponent } from './note-detail/note-detail.component'
+import { NotePresentationComponent } from './note-presentation/note-presentation.component'
 
 import { PkgeltsTableComponent } from './pkgelts-table/pkgelts-table.component'
 import { PkgeltSortingComponent } from './pkgelt-sorting/pkgelt-sorting.component'
@@ -136,6 +142,11 @@ import { VerticePresentationComponent } from './vertice-presentation/vertice-pre
 		LinkSortingComponent,
 		LinkDetailComponent,
 		LinkPresentationComponent,
+
+		NotesTableComponent,
+		NoteSortingComponent,
+		NoteDetailComponent,
+		NotePresentationComponent,
 
 		PkgeltsTableComponent,
 		PkgeltSortingComponent,
@@ -236,6 +247,11 @@ import { VerticePresentationComponent } from './vertice-presentation/vertice-pre
 		LinkDetailComponent,
 		LinkPresentationComponent,
 
+		NotesTableComponent,
+		NoteSortingComponent,
+		NoteDetailComponent,
+		NotePresentationComponent,
+
 		PkgeltsTableComponent,
 		PkgeltSortingComponent,
 		PkgeltDetailComponent,
@@ -267,6 +283,7 @@ import { VerticePresentationComponent } from './vertice-presentation/vertice-pre
 
 	],
 	providers: [
+		GongstructSelectionService,
 		{
 			provide: MatDialogRef,
 			useValue: {}
