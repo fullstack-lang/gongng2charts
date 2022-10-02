@@ -3,8 +3,8 @@ module github.com/fullstack-lang/gongng2charts
 go 1.18
 
 require (
-	github.com/fullstack-lang/gong v0.0.0-20220909154848-8e79c10d34be
-	github.com/fullstack-lang/gongdoc v0.0.0-20220909091506-479f6b7780b4
+	github.com/fullstack-lang/gong v0.0.0-20221002094639-34bbbff0c04a
+	github.com/fullstack-lang/gongdoc v0.0.0-20221002094654-e53186a904a6
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.8.1
