@@ -41,11 +41,12 @@ type LabelInput struct {
 //
 // swagger:route GET /labels labels getLabels
 //
-// Get all labels
+// # Get all labels
 //
 // Responses:
-//    default: genericError
-//        200: labelDBsResponse
+// default: genericError
+//
+//	200: labelDBResponse
 func GetLabels(c *gin.Context) {
 	db := orm.BackRepo.BackRepoLabel.GetDB()
 
@@ -85,14 +86,15 @@ func GetLabels(c *gin.Context) {
 // swagger:route POST /labels labels postLabel
 //
 // Creates a label
-//     Consumes:
-//     - application/json
 //
-//     Produces:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Responses:
-//       200: labelDBResponse
+//	Produces:
+//	- application/json
+//
+//	Responses:
+//	  200: nodeDBResponse
 func PostLabel(c *gin.Context) {
 	db := orm.BackRepo.BackRepoLabel.GetDB()
 
@@ -124,6 +126,14 @@ func PostLabel(c *gin.Context) {
 		return
 	}
 
+	// get an instance (not staged) from DB instance, and call callback function
+	orm.BackRepo.BackRepoLabel.CheckoutPhaseOneInstance(&labelDB)
+	label := (*orm.BackRepo.BackRepoLabel.Map_LabelDBID_LabelPtr)[labelDB.ID]
+
+	if label != nil {
+		models.AfterCreateFromFront(&models.Stage, label)
+	}
+
 	// a POST is equivalent to a back repo commit increase
 	// (this will be improved with implementation of unit of work design pattern)
 	orm.BackRepo.IncrementPushFromFrontNb()
@@ -138,8 +148,9 @@ func PostLabel(c *gin.Context) {
 // Gets the details for a label.
 //
 // Responses:
-//    default: genericError
-//        200: labelDBResponse
+// default: genericError
+//
+//	200: labelDBResponse
 func GetLabel(c *gin.Context) {
 	db := orm.BackRepo.BackRepoLabel.GetDB()
 
@@ -166,11 +177,12 @@ func GetLabel(c *gin.Context) {
 //
 // swagger:route PATCH /labels/{ID} labels updateLabel
 //
-// Update a label
+// # Update a label
 //
 // Responses:
-//    default: genericError
-//        200: labelDBResponse
+// default: genericError
+//
+//	200: labelDBResponse
 func UpdateLabel(c *gin.Context) {
 	db := orm.BackRepo.BackRepoLabel.GetDB()
 
@@ -211,8 +223,20 @@ func UpdateLabel(c *gin.Context) {
 		return
 	}
 
+	// get an instance (not staged) from DB instance, and call callback function
+	labelNew := new(models.Label)
+	labelDB.CopyBasicFieldsToLabel(labelNew)
+
+	// get stage instance from DB instance, and call callback function
+	labelOld := (*orm.BackRepo.BackRepoLabel.Map_LabelDBID_LabelPtr)[labelDB.ID]
+	if labelOld != nil {
+		models.AfterUpdateFromFront(&models.Stage, labelOld, labelNew)
+	}
+
 	// an UPDATE generates a back repo commit increase
 	// (this will be improved with implementation of unit of work design pattern)
+	// in some cases, with the marshalling of the stage, this operation might
+	// generates a checkout
 	orm.BackRepo.IncrementPushFromFrontNb()
 
 	// return status OK with the marshalling of the the labelDB
@@ -223,10 +247,11 @@ func UpdateLabel(c *gin.Context) {
 //
 // swagger:route DELETE /labels/{ID} labels deleteLabel
 //
-// Delete a label
+// # Delete a label
 //
-// Responses:
-//    default: genericError
+// default: genericError
+//
+//	200: labelDBResponse
 func DeleteLabel(c *gin.Context) {
 	db := orm.BackRepo.BackRepoLabel.GetDB()
 
@@ -243,6 +268,16 @@ func DeleteLabel(c *gin.Context) {
 
 	// with gorm.Model field, default delete is a soft delete. Unscoped() force delete
 	db.Unscoped().Delete(&labelDB)
+
+	// get an instance (not staged) from DB instance, and call callback function
+	labelDeleted := new(models.Label)
+	labelDB.CopyBasicFieldsToLabel(labelDeleted)
+
+	// get stage instance from DB instance, and call callback function
+	labelStaged := (*orm.BackRepo.BackRepoLabel.Map_LabelDBID_LabelPtr)[labelDB.ID]
+	if labelStaged != nil {
+		models.AfterDeleteFromFront(&models.Stage, labelStaged, labelDeleted)
+	}
 
 	// a DELETE generates a back repo commit increase
 	// (this will be improved with implementation of unit of work design pattern)

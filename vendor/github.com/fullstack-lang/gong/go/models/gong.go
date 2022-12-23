@@ -2,6 +2,7 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -10,6 +11,9 @@ import (
 	"sort"
 	"strings"
 )
+
+// errUnkownEnum is returns when a value cannot match enum values
+var errUnkownEnum = errors.New("unkown enum")
 
 // swagger:ignore
 type __void any
@@ -31,29 +35,74 @@ type StageStruct struct { // insertion point for definition of arrays registerin
 	GongBasicFields           map[*GongBasicField]any
 	GongBasicFields_mapString map[string]*GongBasicField
 
+	OnAfterGongBasicFieldCreateCallback OnAfterCreateInterface[GongBasicField]
+	OnAfterGongBasicFieldUpdateCallback OnAfterUpdateInterface[GongBasicField]
+	OnAfterGongBasicFieldDeleteCallback OnAfterDeleteInterface[GongBasicField]
+	OnAfterGongBasicFieldReadCallback   OnAfterReadInterface[GongBasicField]
+
 	GongEnums           map[*GongEnum]any
 	GongEnums_mapString map[string]*GongEnum
+
+	OnAfterGongEnumCreateCallback OnAfterCreateInterface[GongEnum]
+	OnAfterGongEnumUpdateCallback OnAfterUpdateInterface[GongEnum]
+	OnAfterGongEnumDeleteCallback OnAfterDeleteInterface[GongEnum]
+	OnAfterGongEnumReadCallback   OnAfterReadInterface[GongEnum]
 
 	GongEnumValues           map[*GongEnumValue]any
 	GongEnumValues_mapString map[string]*GongEnumValue
 
+	OnAfterGongEnumValueCreateCallback OnAfterCreateInterface[GongEnumValue]
+	OnAfterGongEnumValueUpdateCallback OnAfterUpdateInterface[GongEnumValue]
+	OnAfterGongEnumValueDeleteCallback OnAfterDeleteInterface[GongEnumValue]
+	OnAfterGongEnumValueReadCallback   OnAfterReadInterface[GongEnumValue]
+
 	GongNotes           map[*GongNote]any
 	GongNotes_mapString map[string]*GongNote
+
+	OnAfterGongNoteCreateCallback OnAfterCreateInterface[GongNote]
+	OnAfterGongNoteUpdateCallback OnAfterUpdateInterface[GongNote]
+	OnAfterGongNoteDeleteCallback OnAfterDeleteInterface[GongNote]
+	OnAfterGongNoteReadCallback   OnAfterReadInterface[GongNote]
 
 	GongStructs           map[*GongStruct]any
 	GongStructs_mapString map[string]*GongStruct
 
+	OnAfterGongStructCreateCallback OnAfterCreateInterface[GongStruct]
+	OnAfterGongStructUpdateCallback OnAfterUpdateInterface[GongStruct]
+	OnAfterGongStructDeleteCallback OnAfterDeleteInterface[GongStruct]
+	OnAfterGongStructReadCallback   OnAfterReadInterface[GongStruct]
+
 	GongTimeFields           map[*GongTimeField]any
 	GongTimeFields_mapString map[string]*GongTimeField
+
+	OnAfterGongTimeFieldCreateCallback OnAfterCreateInterface[GongTimeField]
+	OnAfterGongTimeFieldUpdateCallback OnAfterUpdateInterface[GongTimeField]
+	OnAfterGongTimeFieldDeleteCallback OnAfterDeleteInterface[GongTimeField]
+	OnAfterGongTimeFieldReadCallback   OnAfterReadInterface[GongTimeField]
 
 	ModelPkgs           map[*ModelPkg]any
 	ModelPkgs_mapString map[string]*ModelPkg
 
+	OnAfterModelPkgCreateCallback OnAfterCreateInterface[ModelPkg]
+	OnAfterModelPkgUpdateCallback OnAfterUpdateInterface[ModelPkg]
+	OnAfterModelPkgDeleteCallback OnAfterDeleteInterface[ModelPkg]
+	OnAfterModelPkgReadCallback   OnAfterReadInterface[ModelPkg]
+
 	PointerToGongStructFields           map[*PointerToGongStructField]any
 	PointerToGongStructFields_mapString map[string]*PointerToGongStructField
 
+	OnAfterPointerToGongStructFieldCreateCallback OnAfterCreateInterface[PointerToGongStructField]
+	OnAfterPointerToGongStructFieldUpdateCallback OnAfterUpdateInterface[PointerToGongStructField]
+	OnAfterPointerToGongStructFieldDeleteCallback OnAfterDeleteInterface[PointerToGongStructField]
+	OnAfterPointerToGongStructFieldReadCallback   OnAfterReadInterface[PointerToGongStructField]
+
 	SliceOfPointerToGongStructFields           map[*SliceOfPointerToGongStructField]any
 	SliceOfPointerToGongStructFields_mapString map[string]*SliceOfPointerToGongStructField
+
+	OnAfterSliceOfPointerToGongStructFieldCreateCallback OnAfterCreateInterface[SliceOfPointerToGongStructField]
+	OnAfterSliceOfPointerToGongStructFieldUpdateCallback OnAfterUpdateInterface[SliceOfPointerToGongStructField]
+	OnAfterSliceOfPointerToGongStructFieldDeleteCallback OnAfterDeleteInterface[SliceOfPointerToGongStructField]
+	OnAfterSliceOfPointerToGongStructFieldReadCallback   OnAfterReadInterface[SliceOfPointerToGongStructField]
 
 	AllModelsStructCreateCallback AllModelsStructCreateInterface
 
@@ -72,6 +121,29 @@ type StageStruct struct { // insertion point for definition of arrays registerin
 
 type OnInitCommitInterface interface {
 	BeforeCommit(stage *StageStruct)
+}
+
+// OnAfterCreateInterface callback when an instance is updated from the front
+type OnAfterCreateInterface[Type Gongstruct] interface {
+	OnAfterCreate(stage *StageStruct,
+		instance *Type)
+}
+
+// OnAfterReadInterface callback when an instance is updated from the front
+type OnAfterReadInterface[Type Gongstruct] interface {
+	OnAfterRead(stage *StageStruct,
+		instance *Type)
+}
+
+// OnAfterUpdateInterface callback when an instance is updated from the front
+type OnAfterUpdateInterface[Type Gongstruct] interface {
+	OnAfterUpdate(stage *StageStruct, old, new *Type)
+}
+
+// OnAfterDeleteInterface callback when an instance is updated from the front
+type OnAfterDeleteInterface[Type Gongstruct] interface {
+	OnAfterDelete(stage *StageStruct,
+		staged, front *Type)
 }
 
 type BackRepoInterface interface {
@@ -1150,6 +1222,10 @@ import (
 	"{{ModelsPackageName}}"
 )
 
+// generated in order to avoid error in the package import
+// if there are no elements in the stage to marshall
+var ___dummy__Stage models.StageStruct
+
 func init() {
 	var __Dummy_time_variable time.Time
 	_ = __Dummy_time_variable
@@ -1169,7 +1245,7 @@ func {{databaseName}}Injection() {
 `
 
 const IdentifiersDecls = `
-	{{Identifier}} := (&models.{{GeneratedStructName}}{Name: "{{GeneratedFieldNameValue}}"}).Stage()`
+	{{Identifier}} := (&models.{{GeneratedStructName}}{Name: ` + "`" + `{{GeneratedFieldNameValue}}` + "`" + `}).Stage()`
 
 const StringInitStatement = `
 	{{Identifier}}.{{GeneratedFieldName}} = ` + "`" + `{{GeneratedFieldNameValue}}` + "`"
@@ -1238,7 +1314,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", gongbasicfield.Name)
 		identifiersDecl += decl
 
-		initializerStatements += fmt.Sprintf("\n\n	// GongBasicField %s values setup", gongbasicfield.Name)
+		initializerStatements += "\n\n	// GongBasicField values setup"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -1294,7 +1370,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", gongenum.Name)
 		identifiersDecl += decl
 
-		initializerStatements += fmt.Sprintf("\n\n	// GongEnum %s values setup", gongenum.Name)
+		initializerStatements += "\n\n	// GongEnum values setup"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -1332,7 +1408,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", gongenumvalue.Name)
 		identifiersDecl += decl
 
-		initializerStatements += fmt.Sprintf("\n\n	// GongEnumValue %s values setup", gongenumvalue.Name)
+		initializerStatements += "\n\n	// GongEnumValue values setup"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -1370,7 +1446,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", gongnote.Name)
 		identifiersDecl += decl
 
-		initializerStatements += fmt.Sprintf("\n\n	// GongNote %s values setup", gongnote.Name)
+		initializerStatements += "\n\n	// GongNote values setup"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -1408,7 +1484,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", gongstruct.Name)
 		identifiersDecl += decl
 
-		initializerStatements += fmt.Sprintf("\n\n	// GongStruct %s values setup", gongstruct.Name)
+		initializerStatements += "\n\n	// GongStruct values setup"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -1440,7 +1516,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", gongtimefield.Name)
 		identifiersDecl += decl
 
-		initializerStatements += fmt.Sprintf("\n\n	// GongTimeField %s values setup", gongtimefield.Name)
+		initializerStatements += "\n\n	// GongTimeField values setup"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -1484,7 +1560,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", modelpkg.Name)
 		identifiersDecl += decl
 
-		initializerStatements += fmt.Sprintf("\n\n	// ModelPkg %s values setup", modelpkg.Name)
+		initializerStatements += "\n\n	// ModelPkg values setup"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -1522,7 +1598,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", pointertogongstructfield.Name)
 		identifiersDecl += decl
 
-		initializerStatements += fmt.Sprintf("\n\n	// PointerToGongStructField %s values setup", pointertogongstructfield.Name)
+		initializerStatements += "\n\n	// PointerToGongStructField values setup"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -1566,7 +1642,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", sliceofpointertogongstructfield.Name)
 		identifiersDecl += decl
 
-		initializerStatements += fmt.Sprintf("\n\n	// SliceOfPointerToGongStructField %s values setup", sliceofpointertogongstructfield.Name)
+		initializerStatements += "\n\n	// SliceOfPointerToGongStructField values setup"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -2568,7 +2644,7 @@ func (gongenumtype GongEnumType) ToInt() (res int) {
 	return
 }
 
-func (gongenumtype *GongEnumType) FromInt(input int) {
+func (gongenumtype *GongEnumType) FromInt(input int) (err error) {
 
 	switch input {
 	// insertion code per enum code
@@ -2576,7 +2652,24 @@ func (gongenumtype *GongEnumType) FromInt(input int) {
 		*gongenumtype = Int
 	case 1:
 		*gongenumtype = String
+	default:
+		return errUnkownEnum
 	}
+	return
+}
+
+func (gongenumtype *GongEnumType) FromCodeString(input string) (err error) {
+
+	switch input {
+	// insertion code per enum code
+	case "Int":
+		*gongenumtype = Int
+	case "String":
+		*gongenumtype = String
+	default:
+		return errUnkownEnum
+	}
+	return
 }
 
 func (gongenumtype *GongEnumType) ToCodeString() (res string) {

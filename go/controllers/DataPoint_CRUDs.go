@@ -41,11 +41,12 @@ type DataPointInput struct {
 //
 // swagger:route GET /datapoints datapoints getDataPoints
 //
-// Get all datapoints
+// # Get all datapoints
 //
 // Responses:
-//    default: genericError
-//        200: datapointDBsResponse
+// default: genericError
+//
+//	200: datapointDBResponse
 func GetDataPoints(c *gin.Context) {
 	db := orm.BackRepo.BackRepoDataPoint.GetDB()
 
@@ -85,14 +86,15 @@ func GetDataPoints(c *gin.Context) {
 // swagger:route POST /datapoints datapoints postDataPoint
 //
 // Creates a datapoint
-//     Consumes:
-//     - application/json
 //
-//     Produces:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Responses:
-//       200: datapointDBResponse
+//	Produces:
+//	- application/json
+//
+//	Responses:
+//	  200: nodeDBResponse
 func PostDataPoint(c *gin.Context) {
 	db := orm.BackRepo.BackRepoDataPoint.GetDB()
 
@@ -124,6 +126,14 @@ func PostDataPoint(c *gin.Context) {
 		return
 	}
 
+	// get an instance (not staged) from DB instance, and call callback function
+	orm.BackRepo.BackRepoDataPoint.CheckoutPhaseOneInstance(&datapointDB)
+	datapoint := (*orm.BackRepo.BackRepoDataPoint.Map_DataPointDBID_DataPointPtr)[datapointDB.ID]
+
+	if datapoint != nil {
+		models.AfterCreateFromFront(&models.Stage, datapoint)
+	}
+
 	// a POST is equivalent to a back repo commit increase
 	// (this will be improved with implementation of unit of work design pattern)
 	orm.BackRepo.IncrementPushFromFrontNb()
@@ -138,8 +148,9 @@ func PostDataPoint(c *gin.Context) {
 // Gets the details for a datapoint.
 //
 // Responses:
-//    default: genericError
-//        200: datapointDBResponse
+// default: genericError
+//
+//	200: datapointDBResponse
 func GetDataPoint(c *gin.Context) {
 	db := orm.BackRepo.BackRepoDataPoint.GetDB()
 
@@ -166,11 +177,12 @@ func GetDataPoint(c *gin.Context) {
 //
 // swagger:route PATCH /datapoints/{ID} datapoints updateDataPoint
 //
-// Update a datapoint
+// # Update a datapoint
 //
 // Responses:
-//    default: genericError
-//        200: datapointDBResponse
+// default: genericError
+//
+//	200: datapointDBResponse
 func UpdateDataPoint(c *gin.Context) {
 	db := orm.BackRepo.BackRepoDataPoint.GetDB()
 
@@ -211,8 +223,20 @@ func UpdateDataPoint(c *gin.Context) {
 		return
 	}
 
+	// get an instance (not staged) from DB instance, and call callback function
+	datapointNew := new(models.DataPoint)
+	datapointDB.CopyBasicFieldsToDataPoint(datapointNew)
+
+	// get stage instance from DB instance, and call callback function
+	datapointOld := (*orm.BackRepo.BackRepoDataPoint.Map_DataPointDBID_DataPointPtr)[datapointDB.ID]
+	if datapointOld != nil {
+		models.AfterUpdateFromFront(&models.Stage, datapointOld, datapointNew)
+	}
+
 	// an UPDATE generates a back repo commit increase
 	// (this will be improved with implementation of unit of work design pattern)
+	// in some cases, with the marshalling of the stage, this operation might
+	// generates a checkout
 	orm.BackRepo.IncrementPushFromFrontNb()
 
 	// return status OK with the marshalling of the the datapointDB
@@ -223,10 +247,11 @@ func UpdateDataPoint(c *gin.Context) {
 //
 // swagger:route DELETE /datapoints/{ID} datapoints deleteDataPoint
 //
-// Delete a datapoint
+// # Delete a datapoint
 //
-// Responses:
-//    default: genericError
+// default: genericError
+//
+//	200: datapointDBResponse
 func DeleteDataPoint(c *gin.Context) {
 	db := orm.BackRepo.BackRepoDataPoint.GetDB()
 
@@ -243,6 +268,16 @@ func DeleteDataPoint(c *gin.Context) {
 
 	// with gorm.Model field, default delete is a soft delete. Unscoped() force delete
 	db.Unscoped().Delete(&datapointDB)
+
+	// get an instance (not staged) from DB instance, and call callback function
+	datapointDeleted := new(models.DataPoint)
+	datapointDB.CopyBasicFieldsToDataPoint(datapointDeleted)
+
+	// get stage instance from DB instance, and call callback function
+	datapointStaged := (*orm.BackRepo.BackRepoDataPoint.Map_DataPointDBID_DataPointPtr)[datapointDB.ID]
+	if datapointStaged != nil {
+		models.AfterDeleteFromFront(&models.Stage, datapointStaged, datapointDeleted)
+	}
 
 	// a DELETE generates a back repo commit increase
 	// (this will be improved with implementation of unit of work design pattern)

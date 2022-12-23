@@ -352,6 +352,7 @@ func (backRepo *BackRepoStruct) CommitLabel(label *models.Label) {
 	if id, ok := (*backRepo.BackRepoLabel.Map_LabelPtr_LabelDBID)[label]; ok {
 		backRepo.BackRepoLabel.CommitPhaseTwoInstance(backRepo, id, label)
 	}
+	backRepo.CommitFromBackNb = backRepo.CommitFromBackNb + 1
 }
 
 // CommitLabel allows checkout of a single label (if already staged and with a BackRepo id)

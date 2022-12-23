@@ -10,7 +10,7 @@ import (
 var Chart uml.Classdiagram = uml.Classdiagram{
 	Classshapes: []*uml.Classshape{
 		{
-			Struct: &(models.ChartConfiguration{}),
+			ReferencedGong: &(models.ChartConfiguration{}),
 			Position: &uml.Position{
 				X: 54.000000,
 				Y: 75.000000,
@@ -47,7 +47,7 @@ var Chart uml.Classdiagram = uml.Classdiagram{
 			},
 		},
 		{
-			Struct: &(models.DataPoint{}),
+			ReferencedGong: &(models.DataPoint{}),
 			Position: &uml.Position{
 				X: 430.000000,
 				Y: 270.000000,
@@ -64,7 +64,7 @@ var Chart uml.Classdiagram = uml.Classdiagram{
 			},
 		},
 		{
-			Struct: &(models.Dataset{}),
+			ReferencedGong: &(models.Dataset{}),
 			Position: &uml.Position{
 				X: 440.000000,
 				Y: 160.000000,
@@ -92,7 +92,7 @@ var Chart uml.Classdiagram = uml.Classdiagram{
 			},
 		},
 		{
-			Struct: &(models.Label{}),
+			ReferencedGong: &(models.Label{}),
 			Position: &uml.Position{
 				X: 447.000000,
 				Y: 75.000000,

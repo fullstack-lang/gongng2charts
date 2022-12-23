@@ -456,6 +456,7 @@ func (backRepo *BackRepoStruct) CommitChartConfiguration(chartconfiguration *mod
 	if id, ok := (*backRepo.BackRepoChartConfiguration.Map_ChartConfigurationPtr_ChartConfigurationDBID)[chartconfiguration]; ok {
 		backRepo.BackRepoChartConfiguration.CommitPhaseTwoInstance(backRepo, id, chartconfiguration)
 	}
+	backRepo.CommitFromBackNb = backRepo.CommitFromBackNb + 1
 }
 
 // CommitChartConfiguration allows checkout of a single chartconfiguration (if already staged and with a BackRepo id)

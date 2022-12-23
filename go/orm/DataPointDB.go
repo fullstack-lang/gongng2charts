@@ -358,6 +358,7 @@ func (backRepo *BackRepoStruct) CommitDataPoint(datapoint *models.DataPoint) {
 	if id, ok := (*backRepo.BackRepoDataPoint.Map_DataPointPtr_DataPointDBID)[datapoint]; ok {
 		backRepo.BackRepoDataPoint.CommitPhaseTwoInstance(backRepo, id, datapoint)
 	}
+	backRepo.CommitFromBackNb = backRepo.CommitFromBackNb + 1
 }
 
 // CommitDataPoint allows checkout of a single datapoint (if already staged and with a BackRepo id)

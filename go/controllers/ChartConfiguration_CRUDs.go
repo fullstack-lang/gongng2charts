@@ -41,11 +41,12 @@ type ChartConfigurationInput struct {
 //
 // swagger:route GET /chartconfigurations chartconfigurations getChartConfigurations
 //
-// Get all chartconfigurations
+// # Get all chartconfigurations
 //
 // Responses:
-//    default: genericError
-//        200: chartconfigurationDBsResponse
+// default: genericError
+//
+//	200: chartconfigurationDBResponse
 func GetChartConfigurations(c *gin.Context) {
 	db := orm.BackRepo.BackRepoChartConfiguration.GetDB()
 
@@ -85,14 +86,15 @@ func GetChartConfigurations(c *gin.Context) {
 // swagger:route POST /chartconfigurations chartconfigurations postChartConfiguration
 //
 // Creates a chartconfiguration
-//     Consumes:
-//     - application/json
 //
-//     Produces:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Responses:
-//       200: chartconfigurationDBResponse
+//	Produces:
+//	- application/json
+//
+//	Responses:
+//	  200: nodeDBResponse
 func PostChartConfiguration(c *gin.Context) {
 	db := orm.BackRepo.BackRepoChartConfiguration.GetDB()
 
@@ -124,6 +126,14 @@ func PostChartConfiguration(c *gin.Context) {
 		return
 	}
 
+	// get an instance (not staged) from DB instance, and call callback function
+	orm.BackRepo.BackRepoChartConfiguration.CheckoutPhaseOneInstance(&chartconfigurationDB)
+	chartconfiguration := (*orm.BackRepo.BackRepoChartConfiguration.Map_ChartConfigurationDBID_ChartConfigurationPtr)[chartconfigurationDB.ID]
+
+	if chartconfiguration != nil {
+		models.AfterCreateFromFront(&models.Stage, chartconfiguration)
+	}
+
 	// a POST is equivalent to a back repo commit increase
 	// (this will be improved with implementation of unit of work design pattern)
 	orm.BackRepo.IncrementPushFromFrontNb()
@@ -138,8 +148,9 @@ func PostChartConfiguration(c *gin.Context) {
 // Gets the details for a chartconfiguration.
 //
 // Responses:
-//    default: genericError
-//        200: chartconfigurationDBResponse
+// default: genericError
+//
+//	200: chartconfigurationDBResponse
 func GetChartConfiguration(c *gin.Context) {
 	db := orm.BackRepo.BackRepoChartConfiguration.GetDB()
 
@@ -166,11 +177,12 @@ func GetChartConfiguration(c *gin.Context) {
 //
 // swagger:route PATCH /chartconfigurations/{ID} chartconfigurations updateChartConfiguration
 //
-// Update a chartconfiguration
+// # Update a chartconfiguration
 //
 // Responses:
-//    default: genericError
-//        200: chartconfigurationDBResponse
+// default: genericError
+//
+//	200: chartconfigurationDBResponse
 func UpdateChartConfiguration(c *gin.Context) {
 	db := orm.BackRepo.BackRepoChartConfiguration.GetDB()
 
@@ -211,8 +223,20 @@ func UpdateChartConfiguration(c *gin.Context) {
 		return
 	}
 
+	// get an instance (not staged) from DB instance, and call callback function
+	chartconfigurationNew := new(models.ChartConfiguration)
+	chartconfigurationDB.CopyBasicFieldsToChartConfiguration(chartconfigurationNew)
+
+	// get stage instance from DB instance, and call callback function
+	chartconfigurationOld := (*orm.BackRepo.BackRepoChartConfiguration.Map_ChartConfigurationDBID_ChartConfigurationPtr)[chartconfigurationDB.ID]
+	if chartconfigurationOld != nil {
+		models.AfterUpdateFromFront(&models.Stage, chartconfigurationOld, chartconfigurationNew)
+	}
+
 	// an UPDATE generates a back repo commit increase
 	// (this will be improved with implementation of unit of work design pattern)
+	// in some cases, with the marshalling of the stage, this operation might
+	// generates a checkout
 	orm.BackRepo.IncrementPushFromFrontNb()
 
 	// return status OK with the marshalling of the the chartconfigurationDB
@@ -223,10 +247,11 @@ func UpdateChartConfiguration(c *gin.Context) {
 //
 // swagger:route DELETE /chartconfigurations/{ID} chartconfigurations deleteChartConfiguration
 //
-// Delete a chartconfiguration
+// # Delete a chartconfiguration
 //
-// Responses:
-//    default: genericError
+// default: genericError
+//
+//	200: chartconfigurationDBResponse
 func DeleteChartConfiguration(c *gin.Context) {
 	db := orm.BackRepo.BackRepoChartConfiguration.GetDB()
 
@@ -243,6 +268,16 @@ func DeleteChartConfiguration(c *gin.Context) {
 
 	// with gorm.Model field, default delete is a soft delete. Unscoped() force delete
 	db.Unscoped().Delete(&chartconfigurationDB)
+
+	// get an instance (not staged) from DB instance, and call callback function
+	chartconfigurationDeleted := new(models.ChartConfiguration)
+	chartconfigurationDB.CopyBasicFieldsToChartConfiguration(chartconfigurationDeleted)
+
+	// get stage instance from DB instance, and call callback function
+	chartconfigurationStaged := (*orm.BackRepo.BackRepoChartConfiguration.Map_ChartConfigurationDBID_ChartConfigurationPtr)[chartconfigurationDB.ID]
+	if chartconfigurationStaged != nil {
+		models.AfterDeleteFromFront(&models.Stage, chartconfigurationStaged, chartconfigurationDeleted)
+	}
 
 	// a DELETE generates a back repo commit increase
 	// (this will be improved with implementation of unit of work design pattern)

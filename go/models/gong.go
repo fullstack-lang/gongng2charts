@@ -2,6 +2,7 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -10,6 +11,9 @@ import (
 	"sort"
 	"strings"
 )
+
+// errUnkownEnum is returns when a value cannot match enum values
+var errUnkownEnum = errors.New("unkown enum")
 
 // swagger:ignore
 type __void any
@@ -31,14 +35,34 @@ type StageStruct struct { // insertion point for definition of arrays registerin
 	ChartConfigurations           map[*ChartConfiguration]any
 	ChartConfigurations_mapString map[string]*ChartConfiguration
 
+	OnAfterChartConfigurationCreateCallback OnAfterCreateInterface[ChartConfiguration]
+	OnAfterChartConfigurationUpdateCallback OnAfterUpdateInterface[ChartConfiguration]
+	OnAfterChartConfigurationDeleteCallback OnAfterDeleteInterface[ChartConfiguration]
+	OnAfterChartConfigurationReadCallback   OnAfterReadInterface[ChartConfiguration]
+
 	DataPoints           map[*DataPoint]any
 	DataPoints_mapString map[string]*DataPoint
+
+	OnAfterDataPointCreateCallback OnAfterCreateInterface[DataPoint]
+	OnAfterDataPointUpdateCallback OnAfterUpdateInterface[DataPoint]
+	OnAfterDataPointDeleteCallback OnAfterDeleteInterface[DataPoint]
+	OnAfterDataPointReadCallback   OnAfterReadInterface[DataPoint]
 
 	Datasets           map[*Dataset]any
 	Datasets_mapString map[string]*Dataset
 
+	OnAfterDatasetCreateCallback OnAfterCreateInterface[Dataset]
+	OnAfterDatasetUpdateCallback OnAfterUpdateInterface[Dataset]
+	OnAfterDatasetDeleteCallback OnAfterDeleteInterface[Dataset]
+	OnAfterDatasetReadCallback   OnAfterReadInterface[Dataset]
+
 	Labels           map[*Label]any
 	Labels_mapString map[string]*Label
+
+	OnAfterLabelCreateCallback OnAfterCreateInterface[Label]
+	OnAfterLabelUpdateCallback OnAfterUpdateInterface[Label]
+	OnAfterLabelDeleteCallback OnAfterDeleteInterface[Label]
+	OnAfterLabelReadCallback   OnAfterReadInterface[Label]
 
 	AllModelsStructCreateCallback AllModelsStructCreateInterface
 
@@ -57,6 +81,29 @@ type StageStruct struct { // insertion point for definition of arrays registerin
 
 type OnInitCommitInterface interface {
 	BeforeCommit(stage *StageStruct)
+}
+
+// OnAfterCreateInterface callback when an instance is updated from the front
+type OnAfterCreateInterface[Type Gongstruct] interface {
+	OnAfterCreate(stage *StageStruct,
+		instance *Type)
+}
+
+// OnAfterReadInterface callback when an instance is updated from the front
+type OnAfterReadInterface[Type Gongstruct] interface {
+	OnAfterRead(stage *StageStruct,
+		instance *Type)
+}
+
+// OnAfterUpdateInterface callback when an instance is updated from the front
+type OnAfterUpdateInterface[Type Gongstruct] interface {
+	OnAfterUpdate(stage *StageStruct, old, new *Type)
+}
+
+// OnAfterDeleteInterface callback when an instance is updated from the front
+type OnAfterDeleteInterface[Type Gongstruct] interface {
+	OnAfterDelete(stage *StageStruct,
+		staged, front *Type)
 }
 
 type BackRepoInterface interface {
@@ -585,11 +632,17 @@ import (
 	"{{ModelsPackageName}}"
 )
 
-func init() {
-	var __Dummy_time_variable time.Time
-	_ = __Dummy_time_variable
-	InjectionGateway["{{databaseName}}"] = {{databaseName}}Injection
-}
+// generated in order to avoid error in the package import
+// if there are no elements in the stage to marshall
+var ___dummy__Stage models.StageStruct
+var ___dummy__Time time.Time
+
+// init might be handy if one want to have the data embedded in the binary
+// but it has to properly reference the Injection gateway in the main package
+// func init() {
+// 	_ = __Dummy_time_variable
+// 	InjectionGateway["{{databaseName}}"] = {{databaseName}}Injection
+// }
 
 // {{databaseName}}Injection will stage objects of database "{{databaseName}}"
 func {{databaseName}}Injection() {
@@ -604,7 +657,7 @@ func {{databaseName}}Injection() {
 `
 
 const IdentifiersDecls = `
-	{{Identifier}} := (&models.{{GeneratedStructName}}{Name: "{{GeneratedFieldNameValue}}"}).Stage()`
+	{{Identifier}} := (&models.{{GeneratedStructName}}{Name: ` + "`" + `{{GeneratedFieldNameValue}}` + "`" + `}).Stage()`
 
 const StringInitStatement = `
 	{{Identifier}}.{{GeneratedFieldName}} = ` + "`" + `{{GeneratedFieldNameValue}}` + "`"
@@ -673,7 +726,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", chartconfiguration.Name)
 		identifiersDecl += decl
 
-		initializerStatements += fmt.Sprintf("\n\n	// ChartConfiguration %s values setup", chartconfiguration.Name)
+		initializerStatements += "\n\n	// ChartConfiguration values setup"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -725,7 +778,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", datapoint.Name)
 		identifiersDecl += decl
 
-		initializerStatements += fmt.Sprintf("\n\n	// DataPoint %s values setup", datapoint.Name)
+		initializerStatements += "\n\n	// DataPoint values setup"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -763,7 +816,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", dataset.Name)
 		identifiersDecl += decl
 
-		initializerStatements += fmt.Sprintf("\n\n	// Dataset %s values setup", dataset.Name)
+		initializerStatements += "\n\n	// Dataset values setup"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -801,7 +854,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", label.Name)
 		identifiersDecl += decl
 
-		initializerStatements += fmt.Sprintf("\n\n	// Label %s values setup", label.Name)
+		initializerStatements += "\n\n	// Label values setup"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -1324,7 +1377,7 @@ func (charttype ChartType) ToString() (res string) {
 	return
 }
 
-func (charttype *ChartType) FromString(input string) {
+func (charttype *ChartType) FromString(input string) (err error) {
 
 	switch input {
 	// insertion code per enum code
@@ -1340,7 +1393,32 @@ func (charttype *ChartType) FromString(input string) {
 		*charttype = POLAR_AREA
 	case "doughnut":
 		*charttype = DOUGHNUT
+	default:
+		return errUnkownEnum
 	}
+	return
+}
+
+func (charttype *ChartType) FromCodeString(input string) (err error) {
+
+	switch input {
+	// insertion code per enum code
+	case "LINE":
+		*charttype = LINE
+	case "BAR":
+		*charttype = BAR
+	case "RADAR":
+		*charttype = RADAR
+	case "PIE":
+		*charttype = PIE
+	case "POLAR_AREA":
+		*charttype = POLAR_AREA
+	case "DOUGHNUT":
+		*charttype = DOUGHNUT
+	default:
+		return errUnkownEnum
+	}
+	return
 }
 
 func (charttype *ChartType) ToCodeString() (res string) {

@@ -41,11 +41,12 @@ type DatasetInput struct {
 //
 // swagger:route GET /datasets datasets getDatasets
 //
-// Get all datasets
+// # Get all datasets
 //
 // Responses:
-//    default: genericError
-//        200: datasetDBsResponse
+// default: genericError
+//
+//	200: datasetDBResponse
 func GetDatasets(c *gin.Context) {
 	db := orm.BackRepo.BackRepoDataset.GetDB()
 
@@ -85,14 +86,15 @@ func GetDatasets(c *gin.Context) {
 // swagger:route POST /datasets datasets postDataset
 //
 // Creates a dataset
-//     Consumes:
-//     - application/json
 //
-//     Produces:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Responses:
-//       200: datasetDBResponse
+//	Produces:
+//	- application/json
+//
+//	Responses:
+//	  200: nodeDBResponse
 func PostDataset(c *gin.Context) {
 	db := orm.BackRepo.BackRepoDataset.GetDB()
 
@@ -124,6 +126,14 @@ func PostDataset(c *gin.Context) {
 		return
 	}
 
+	// get an instance (not staged) from DB instance, and call callback function
+	orm.BackRepo.BackRepoDataset.CheckoutPhaseOneInstance(&datasetDB)
+	dataset := (*orm.BackRepo.BackRepoDataset.Map_DatasetDBID_DatasetPtr)[datasetDB.ID]
+
+	if dataset != nil {
+		models.AfterCreateFromFront(&models.Stage, dataset)
+	}
+
 	// a POST is equivalent to a back repo commit increase
 	// (this will be improved with implementation of unit of work design pattern)
 	orm.BackRepo.IncrementPushFromFrontNb()
@@ -138,8 +148,9 @@ func PostDataset(c *gin.Context) {
 // Gets the details for a dataset.
 //
 // Responses:
-//    default: genericError
-//        200: datasetDBResponse
+// default: genericError
+//
+//	200: datasetDBResponse
 func GetDataset(c *gin.Context) {
 	db := orm.BackRepo.BackRepoDataset.GetDB()
 
@@ -166,11 +177,12 @@ func GetDataset(c *gin.Context) {
 //
 // swagger:route PATCH /datasets/{ID} datasets updateDataset
 //
-// Update a dataset
+// # Update a dataset
 //
 // Responses:
-//    default: genericError
-//        200: datasetDBResponse
+// default: genericError
+//
+//	200: datasetDBResponse
 func UpdateDataset(c *gin.Context) {
 	db := orm.BackRepo.BackRepoDataset.GetDB()
 
@@ -211,8 +223,20 @@ func UpdateDataset(c *gin.Context) {
 		return
 	}
 
+	// get an instance (not staged) from DB instance, and call callback function
+	datasetNew := new(models.Dataset)
+	datasetDB.CopyBasicFieldsToDataset(datasetNew)
+
+	// get stage instance from DB instance, and call callback function
+	datasetOld := (*orm.BackRepo.BackRepoDataset.Map_DatasetDBID_DatasetPtr)[datasetDB.ID]
+	if datasetOld != nil {
+		models.AfterUpdateFromFront(&models.Stage, datasetOld, datasetNew)
+	}
+
 	// an UPDATE generates a back repo commit increase
 	// (this will be improved with implementation of unit of work design pattern)
+	// in some cases, with the marshalling of the stage, this operation might
+	// generates a checkout
 	orm.BackRepo.IncrementPushFromFrontNb()
 
 	// return status OK with the marshalling of the the datasetDB
@@ -223,10 +247,11 @@ func UpdateDataset(c *gin.Context) {
 //
 // swagger:route DELETE /datasets/{ID} datasets deleteDataset
 //
-// Delete a dataset
+// # Delete a dataset
 //
-// Responses:
-//    default: genericError
+// default: genericError
+//
+//	200: datasetDBResponse
 func DeleteDataset(c *gin.Context) {
 	db := orm.BackRepo.BackRepoDataset.GetDB()
 
@@ -243,6 +268,16 @@ func DeleteDataset(c *gin.Context) {
 
 	// with gorm.Model field, default delete is a soft delete. Unscoped() force delete
 	db.Unscoped().Delete(&datasetDB)
+
+	// get an instance (not staged) from DB instance, and call callback function
+	datasetDeleted := new(models.Dataset)
+	datasetDB.CopyBasicFieldsToDataset(datasetDeleted)
+
+	// get stage instance from DB instance, and call callback function
+	datasetStaged := (*orm.BackRepo.BackRepoDataset.Map_DatasetDBID_DatasetPtr)[datasetDB.ID]
+	if datasetStaged != nil {
+		models.AfterDeleteFromFront(&models.Stage, datasetStaged, datasetDeleted)
+	}
 
 	// a DELETE generates a back repo commit increase
 	// (this will be improved with implementation of unit of work design pattern)

@@ -78,7 +78,7 @@ export class Gongng2chartsChartComponent implements OnInit {
   frontRepo: gongng2charts.FrontRepo = new gongng2charts.FrontRepo
 
   constructor(
-    private gongng2chartsCommitNbService: gongng2charts.CommitNbService,
+    private gongng2chartsCommitNbService: gongng2charts.CommitNbFromBackService,
     private gongng2chartsPushFromFrontNbService: gongng2charts.PushFromFrontNbService,
     private frontRepoService: gongng2charts.FrontRepoService,
     private router: Router,
@@ -95,7 +95,7 @@ export class Gongng2chartsChartComponent implements OnInit {
         this.currTime = currTime
 
         // see above for the explanation
-        this.gongng2chartsCommitNbService.getCommitNb().subscribe(
+        this.gongng2chartsCommitNbService.getCommitNbFromBack().subscribe(
           commitNb => {
             if (this.lastCommitNb < commitNb) {
 

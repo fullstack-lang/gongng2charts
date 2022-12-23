@@ -4,32 +4,29 @@ import (
 	"embed"
 	"flag"
 	"fmt"
-	"go/token"
 	"io/fs"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 
-	"github.com/fullstack-lang/gongng2charts/go/controllers"
+	"github.com/fullstack-lang/gongng2charts/go/fullstack"
 	"github.com/fullstack-lang/gongng2charts/go/models"
-	"github.com/fullstack-lang/gongng2charts/go/orm"
 
 	// gong stack for model analysis
-	gong_controllers "github.com/fullstack-lang/gong/go/controllers"
+	gong_fullstack "github.com/fullstack-lang/gong/go/fullstack"
 	gong_models "github.com/fullstack-lang/gong/go/models"
-	gong_orm "github.com/fullstack-lang/gong/go/orm"
-	_ "github.com/fullstack-lang/gong/ng"
 
 	// for diagrams
-	gongdoc_controllers "github.com/fullstack-lang/gongdoc/go/controllers"
+	gongdoc_fullstack "github.com/fullstack-lang/gongdoc/go/fullstack"
 	gongdoc_models "github.com/fullstack-lang/gongdoc/go/models"
-	gongdoc_orm "github.com/fullstack-lang/gongdoc/go/orm"
-	_ "github.com/fullstack-lang/gongdoc/ng"
+
+	// insertion point for gong front end import{{gongdocNgImport}}
 
 	gongng2charts "github.com/fullstack-lang/gongng2charts"
 )
@@ -38,11 +35,13 @@ var (
 	logDBFlag  = flag.Bool("logDB", false, "log mode for db")
 	logGINFlag = flag.Bool("logGIN", false, "log mode for gin")
 
-	marshallOnStartup = flag.String("marshallOnStartup", "", "at startup, marshall staged data to a go file with the marshall name and '.go' (must be lowercased without spaces). If marshall arg is '', no marshalling")
-	unmarshall        = flag.String("unmarshall", "", "unmarshall data from marshall name and '.go' (must be lowercased without spaces), If unmarshall arg is '', no unmarshalling")
-	marshallOnCommit  = flag.String("marshallOnCommit", "", "on all commits, marshall staged data to a go file with the marshall name and '.go' (must be lowercased without spaces). If marshall arg is '', no marshalling")
+	marshallOnStartup  = flag.String("marshallOnStartup", "", "at startup, marshall staged data to a go file with the marshall name and '.go' (must be lowercased without spaces). If marshall arg is '', no marshalling")
+	unmarshallFromCode = flag.String("unmarshallFromCode", "", "unmarshall data from go file and '.go' (must be lowercased without spaces), If unmarshallFromCode arg is '', no unmarshalling")
+	unmarshall         = flag.String("unmarshall", "", "unmarshall data from marshall name and '.go' (must be lowercased without spaces), If unmarshall arg is '', no unmarshalling")
+	marshallOnCommit   = flag.String("marshallOnCommit", "", "on all commits, marshall staged data to a go file with the marshall name and '.go' (must be lowercased without spaces). If marshall arg is '', no marshalling")
 
-	diagrams = flag.Bool("diagrams", true, "parse/analysis go/models and go/diagrams (takes a few seconds)")
+	diagrams         = flag.Bool("diagrams", true, "parse/analysis go/models and go/diagrams")
+	embeddedDiagrams = flag.Bool("embeddedDiagrams", false, "parse/analysis go/models and go/embeddedDiagrams")
 )
 
 // InjectionGateway is the singloton that stores all functions
@@ -81,27 +80,8 @@ func main() {
 	r := gin.Default()
 	r.Use(cors.Default())
 
-	// setup GORM
-	db := orm.SetupModels(*logDBFlag, "file:memdb1?mode=memory&cache=shared")
-	dbDB, err := db.DB()
-
-	//
-	// gong and gongdoc databases do not need to be persisted.
-	// therefore, they are in memory
-	//
-	db_inMemory := gong_orm.SetupModels(*logDBFlag, "file:memdb2?mode=memory&cache=shared")
-
-	// since gongsim is a multi threaded application. It is important to set up
-	// only one open connexion at a time
-	dbDB_inMemory, err := db_inMemory.DB()
-	if err != nil {
-		panic("cannot access DB of db" + err.Error())
-	}
-	// it is mandatory to allow parallel access, otherwise, bizarre errors occurs
-	dbDB_inMemory.SetMaxOpenConns(1)
-
-	// add gongdocatabase
-	gongdoc_orm.AutoMigrate(db_inMemory)
+	// setup stack
+	fullstack.Init(r, "./test.db")
 
 	// generate injection code from the stage
 	if *marshallOnStartup != "" {
@@ -133,6 +113,27 @@ func main() {
 			InjectionGateway[*unmarshall]()
 		}
 		models.Stage.Commit()
+	} else {
+		// in case the database is used, checkout the content to the stage
+		models.Stage.Checkout()
+	}
+
+	if *unmarshallFromCode != "" {
+		models.Stage.Checkout()
+		models.Stage.Reset()
+		models.Stage.Commit()
+		err := models.ParseAstFile(*unmarshallFromCode)
+
+		// if the application is run with -unmarshallFromCode=xxx.go -marshallOnCommit
+		// xxx.go might be absent the first time. However, this shall not be a show stopper.
+		if err != nil {
+			log.Println("no file to read " + err.Error())
+		}
+
+		models.Stage.Commit()
+	} else {
+		// in case the database is used, checkout the content to the stage
+		models.Stage.Checkout()
 	}
 
 	// hook automatic marshall to go code at every commit
@@ -141,63 +142,40 @@ func main() {
 		models.Stage.OnInitCommitFromFrontCallback = hook
 	}
 
-	// since the stack can be a multi threaded application. It is important to set up
-	// only one open connexion at a time
-	if err != nil {
-		panic("cannot access DB of db" + err.Error())
-	}
-	dbDB.SetMaxOpenConns(1)
-
 	if *diagrams {
 
 		// Analyse package
-		modelPkg := &gong_models.ModelPkg{}
-
-		// since the source is embedded, one needs to
-		// compute the Abstract syntax tree in a special manner
-		pkgs := gong_models.ParseEmbedModel(gongng2charts.GoDir, "go/models")
-
-		gong_models.WalkParser(pkgs, modelPkg)
-		modelPkg.SerializeToStage()
-		gong_models.Stage.Commit()
+		gong_fullstack.Init(r)
+		gongdoc_fullstack.Init(r)
+		modelPackage, _ := gong_models.LoadEmbedded(gongng2charts.GoDir)
 
 		// create the diagrams
 		// prepare the model views
-		pkgelt := new(gongdoc_models.Pkgelt)
+		var diagramPackage *gongdoc_models.DiagramPackage
 
 		// first, get all gong struct in the model
 		for gongStruct := range gong_models.Stage.GongStructs {
 
 			// let create the gong struct in the gongdoc models
 			// and put the numbre of instances
-			gongStruct_ := (&gongdoc_models.GongStruct{Name: gongStruct.Name}).Stage()
+			reference := (&gongdoc_models.Reference{Name: gongStruct.Name}).Stage()
+			reference.Type = gongdoc_models.REFERENCE_GONG_STRUCT
 			nbInstances, ok := models.Stage.Map_GongStructName_InstancesNb[gongStruct.Name]
 			if ok {
-				gongStruct_.NbInstances = nbInstances
+				reference.NbInstances = nbInstances
 			}
 		}
 
-		// classdiagram can only be fully in memory when they are Unmarshalled
-		// for instance, the Name of diagrams or the Name of the Link
-		fset := new(token.FileSet)
-		pkgsParser := gong_models.ParseEmbedModel(gongng2charts.GoDir, "go/diagrams")
-		if len(pkgsParser) != 1 {
-			log.Panic("Unable to parser, wrong number of parsers ", len(pkgsParser))
+		if *embeddedDiagrams {
+			diagramPackage, _ = gongdoc_models.LoadEmbedded(gongng2charts.GoDir, modelPackage)
+		} else {
+			diagramPackage, _ = gongdoc_models.Load(filepath.Join("../../diagrams"), modelPackage, true)
 		}
-		if pkgParser, ok := pkgsParser["diagrams"]; ok {
-			pkgelt.Unmarshall(modelPkg, pkgParser, fset, "go/diagrams")
-		}
-		pkgelt.SerializeToStage()
+		
+		diagramPackage.GongModelPath = "github.com/fullstack-lang/gongng2charts/go/models"
 	}
 
-	GenerateChart()
-
-	controllers.RegisterControllers(r)
-	gongdoc_controllers.RegisterControllers(r)
-	gong_controllers.RegisterControllers(r)
-	gongdoc_models.Stage.Commit()
-	gong_models.Stage.Commit()
-
+	// insertion point for serving the static file
 	// provide the static route for the angular pages
 	r.Use(static.Serve("/", EmbedFolder(gongng2charts.NgDistNg, "ng/dist/ng")))
 	r.NoRoute(func(c *gin.Context) {

@@ -404,6 +404,7 @@ func (backRepo *BackRepoStruct) CommitDataset(dataset *models.Dataset) {
 	if id, ok := (*backRepo.BackRepoDataset.Map_DatasetPtr_DatasetDBID)[dataset]; ok {
 		backRepo.BackRepoDataset.CommitPhaseTwoInstance(backRepo, id, dataset)
 	}
+	backRepo.CommitFromBackNb = backRepo.CommitFromBackNb + 1
 }
 
 // CommitDataset allows checkout of a single dataset (if already staged and with a BackRepo id)
